@@ -91,7 +91,6 @@ class LeaderboardApp {
                         const rank = index + 1;
                         const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
                         const memberCount = server.member_count || 0;
-                        const lastUpdated = this.formatDate(server.last_updated);
 
                         return `
                             <tr class="leaderboard-row">
