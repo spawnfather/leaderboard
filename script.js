@@ -98,15 +98,10 @@ class LeaderboardApp {
                                 <td class="rank ${rankClass}">${rank}</td>
                                 <td class="server-name">
                                     <div class="server-info">
-                                        <img src="https://cdn.discordapp.com/icons/${server.guild_id}/${server.icon_hash || 'unknown'}.png?size=64" 
-                                             alt="${this.escapeHtml(server.server_name)}" 
-                                             class="server-icon"
-                                             onerror="this.src='https://via.placeholder.com/64/5865F2/ffffff?text=DS'">
                                         <span>${this.escapeHtml(server.server_name)}</span>
                                     </div>
                                 </td>
                                 <td class="member-count">${this.formatNumber(memberCount)}</td>
-                                <td class="last-updated">${lastUpdated}</td>
                             </tr>
                         `;
                     }).join('')}
