@@ -1,121 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Top 10 Discord Servers</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      background-color: #111827;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 1rem;
-    }
-    h1 {
-      font-size: 1.5rem;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    table {
-      width: 100%;
-      max-width: 600px;
-      border-collapse: collapse;
-      background-color: #1f2937;
-      border-radius: 0.5rem;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 0.75rem;
-      text-align: left;
-      border: 1px solid #4b5563;
-    }
-    th {
-      background-color: #374151;
-    }
-    tr:nth-child(even) {
-      background-color: #2d3748;
-    }
-    tr:hover {
-      background-color: #4b5563;
-    }
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.2rem;
-      }
-      th, td {
-        font-size: 0.9rem;
-        padding: 0.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Server Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Top 10 Discord Servers</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Server Name</th>
-        <th>Members</th>
-        <th>Updated</th>
-      </tr>
-    </thead>
-    <tbody id="leaderboard-body"></tbody>
-  </table>
+    <div class="container">
+        <header>
+            <h1>🏆 Spawnism Server Leaderboard 🏆</h1>
+            <p>Top 10 Most Popular Servers</p>
+        </header>
 
-  <script>
-    // Initialize Supabase client
-    const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co'; // Replace with your Supabase URL
-    const SUPABASE_KEY = 'sb_publishable_5_TJhKeAHObjp2MckpgJug_PhD7jOQx'; // Replace with your Supabase anon key
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        <div class="controls">
+            <button id="refreshBtn" class="refresh-btn">🔄 Refresh Leaderboard</button>
+            <span id="lastUpdated" class="last-updated">Last updated: Loading...</span>
+        </div>
 
-    // Function to fetch and display top 10 servers
-    async function fetchLeaderboard() {
-      const tbody = document.getElementById('leaderboard-body');
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Loading...</td></tr>';
+        <div id="loading" class="loading">Loading leaderboard...</div>
+        
+        <div id="leaderboard" class="leaderboard">
+            <!-- Leaderboard items will be populated by JavaScript -->
+        </div>
 
-      const { data, error } = await supabase
-        .from('leaderboardmain')
-        .select('guild_id, server_name, member_count, last_updated')
-        .order('member_count', { ascending: false })
-        .limit(10);
+        <div id="error" class="error" style="display: none;">
+            <p>⚠️ Failed to load leaderboard. Please check your connection and try again.</p>
+        </div>
+    </div>
 
-      if (error) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #f87171;">Error loading leaderboard</td></tr>';
-        console.error('Error:', error);
-        return;
-      }
-
-      tbody.innerHTML = '';
-      data.forEach((row, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${row.server_name}</td>
-          <td>${row.member_count.toLocaleString()}</td>
-          <td>${new Date(row.last_updated).toLocaleDateString()}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Subscribe to real-time changes
-    supabase
-      .channel('leaderboardmain')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leaderboardmain' }, () => {
-        console.log('Leaderboard updated');
-        fetchLeaderboard();
-      })
-      .subscribe();
-
-    // Initial fetch
-    fetchLeaderboard();
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
