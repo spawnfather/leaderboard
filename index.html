@@ -3,32 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Server Leaderboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Server Leaderboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        #refresh-btn {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #refresh-btn:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        #loading {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* Responsive design for mobile */
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            td:before {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-align: left;
+            }
+            td:nth-of-type(1):before { content: "Rank"; }
+            td:nth-of-type(2):before { content: "Server Name"; }
+            td:nth-of-type(3):before { content: "Member Count"; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🏆 Spawnism Server Leaderboard 🏆</h1>
-            <p>Top 10 Most Popular Servers</p>
-        </header>
-
-        <div class="controls">
-            <button id="refreshBtn" class="refresh-btn">🔄 Refresh Leaderboard</button>
-            <span id="lastUpdated" class="last-updated">Last updated: Loading...</span>
-        </div>
-
-        <div id="loading" class="loading">Loading leaderboard...</div>
-        
-        <div id="leaderboard" class="leaderboard">
-            <!-- Leaderboard items will be populated by JavaScript -->
-        </div>
-
-        <div id="error" class="error" style="display: none;">
-            <p>⚠️ Failed to load leaderboard. Please check your connection and try again.</p>
-        </div>
+        <h1>Server Leaderboard</h1>
+        <button id="refresh-btn">Refresh</button>
+        <div id="loading">Loading data...</div>
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Server Name</th>
+                    <th>Member Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Replace with your Supabase URL and anon key
+        const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co'; // e.g., https://abc123.supabase.co
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA'; // Get from Supabase dashboard
+
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const tbody = document.querySelector('#leaderboard tbody');
+        const loading = document.getElementById('loading');
+        const refreshBtn = document.getElementById('refresh-btn');
+
+        async function fetchAndDisplayData() {
+            loading.style.display = 'block';
+            tbody.innerHTML = ''; // Clear existing data
+
+            try {
+                let { data, error } = await supabase
+                    .from('leaderboardmain')
+                    .select('server_name, member_count')
+                    .order('member_count', { ascending: false });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    data.forEach((item, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${item.server_name}</td>
+                            <td>${item.member_count}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No data available</td></tr>';
+                }
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading data. Please try again.</td></tr>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Initial load
+        fetchAndDisplayData();
+
+        // Refresh button
+        refreshBtn.addEventListener('click', fetchAndDisplayData);
+    </script>
 </body>
 </html>
