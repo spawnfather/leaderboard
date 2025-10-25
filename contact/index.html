@@ -3,21 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Spawnboard</title>
-    <!-- Add any shared styles or scripts from your main site here -->
-    <link rel="stylesheet" href="/styles.css"> <!-- Example: link to your site's CSS -->
+    <title>Contact - Spawn Board</title>
+    <!-- Assuming your site has a global stylesheet; adjust the path as needed -->
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Basic fallback styles to match a modern, clean design (light theme with blue accents).
+           Adjust if your global CSS overrides these. */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+        }
+        main {
+            padding: 40px 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            align-self: flex-start;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
+    <!-- Header and Navigation: Replicate your site's nav structure here -->
     <header>
-        <!-- Add your site's navigation here, e.g., <a href="/">Home</a> | <a href="/contact">Contact</a> -->
+        <nav>
+            <ul>
+                <li><a href="/leaderboard">Leaderboard</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <!-- Add more nav items as per your site's scheme -->
+            </ul>
+        </nav>
     </header>
+
     <main>
-        <h1>Contact not added yet!</h1>
-        <p>Please check back another time to see if I added it.</p>
-        <!-- Simple contact form example (see notes below for handling submissions) -->
+        <h1>Request for a Discord Server to be added to the leaderboard</h1>
+        <p style="text-align: center; margin-bottom: 30px; color: #666;">
+            Enter the invite code/link for your Discord server and a brief description. We'll review it and add it to our leaderboard if it fits!
+        </p>
+        
+        <form action="https://formspree.io/f/mnnoabkr" method="POST">
+            <label for="invite">Discord Invite Code/Link:</label>
+            <input type="text" id="invite" name="invite" placeholder="e.g., https://discord.gg/abc123 or abc123" required>
+            
+            <label for="description">Basic Description of the Server:</label>
+            <textarea id="description" name="description" placeholder="Tell us about your server in a few sentences..." rows="4" required></textarea>
+            
+            <button type="submit">Submit Invite</button>
+        </form>
     </main>
+
+    <!-- Footer: Replicate your site's footer -->
     <footer>
-        <!-- Add your site's footer here -->
+        &copy; 2025 SpawnBoard. All rights reserved. | <a href="/privacy">Privacy Policy</a>
     </footer>
 </body>
 </html>
