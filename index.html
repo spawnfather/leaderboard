@@ -127,6 +127,14 @@
 
     <script type="module">
 
+        function getMedal(rank) {
+            
+            if (rank === 1) return '🥇';
+            if (rank === 2) return '🥈';
+            if (rank === 3) return '🥉';
+            return '🏅';
+        }
+
         import { createClient } from
       'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         
@@ -155,8 +163,10 @@
                 if (data && data.length > 0) {
                     data.forEach((item, index) => {
                         const row = document.createElement('tr');
+                        const rank = index + 1;
+                        
                         row.innerHTML = `
-                            <td>${index + 1}</td>
+                            <td>${rank} ${getMedal(rank)}</td>
                             <td>${item.server_name}</td>
                             <td>${item.member_count}</td>
                             <td>${item.invite_code}</td>
