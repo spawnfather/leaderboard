@@ -77,6 +77,25 @@
             color: #666;
         }
 
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+        }
+
+
         /* Responsive design for mobile */
         @media (max-width: 768px) {
             table, thead, tbody, th, td, tr {
@@ -118,6 +137,17 @@
     </style>
 </head>
 <body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/leaderboard">Leaderboard</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <!-- Add more nav items as per your site's scheme -->
+            </ul>
+        </nav>
+    </header>
+    
     <div class="container">
         <h1>Server Leaderboard</h1>
         <button id="refresh-btn">Refresh</button>
