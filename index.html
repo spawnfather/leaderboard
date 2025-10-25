@@ -113,8 +113,9 @@
             <thead>
                 <tr>
                     <th>Rank</th>
-                    <th>Server Name</th>
-                    <th>Member Count</th>
+                    <th>Server Name:</th>
+                    <th>Member Count:</th>
+                    <th>Invite Code:</th>
                 </tr>
             </thead>
             <tbody>
@@ -145,7 +146,7 @@
             try {
                 let { data, error } = await supabase
                     .from('leaderboardmain')
-                    .select('server_name, member_count')
+                    .select('server_name, member_count, invite_code')
                     .order('member_count', { ascending: false });
 
                 if (error) throw error;
@@ -157,6 +158,7 @@
                             <td>${index + 1}</td>
                             <td>${item.server_name}</td>
                             <td>${item.member_count}</td>
+                            <td>${item.invite_code}</td>
                         `;
                         tbody.appendChild(row);
                     });
