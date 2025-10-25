@@ -236,7 +236,7 @@
                         data[0].last_updated
                     );
 
-                    lastUpdated.textContent = `Last Updated: ${new Date(maxUpdated).toLocaleString('en-US', {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`;
+                    lastUpdated.textContent = `Last Updated: ${new Date(maxUpdated).toLocaleString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`;
                     
                 } else {
                     tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No data available</td></tr>';
