@@ -163,6 +163,7 @@
     <div class="container">
         <h1>Server Leaderboard</h1>
         <button id="refresh-btn">Refresh</button>
+        <p id="last-updated" style="text-align: center; font-style: italic; color: #7f8c8d; margin: 10px 0;"></p>
         <div id="loading">Loading data...</div>
         <table id="leaderboard">
             <thead>
@@ -201,15 +202,17 @@
         const tbody = document.querySelector('#leaderboard tbody');
         const loading = document.getElementById('loading');
         const refreshBtn = document.getElementById('refresh-btn');
+        const lastUpdated = document.getElementById('last-updated');
 
         async function fetchAndDisplayData() {
             loading.style.display = 'block';
             tbody.innerHTML = ''; // Clear existing data
+            lastUpdated.textContent = '';
 
             try {
                 let { data, error } = await supabase
                     .from('leaderboardmain')
-                    .select('server_name, member_count, invite_code')
+                    .select('server_name, member_count, invite_code, last_updated')
                     .order('member_count', { ascending: false });
 
                 if (error) throw error;
@@ -227,12 +230,29 @@
                         `;
                         tbody.appendChild(row);
                     });
+
+                    const maxUpdated = data.reduce((max, item) => 
+                        (item.last_updated > max ? item.last_updated : max), 
+                        data[0].last_updated
+                    );
+
+                    lastUpdated.textContent = "Last Updated: ${new Date(maxUpdated).toLocaleString('en-US', {
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        hour: 'numeric', 
+                        minute: 'numeric', 
+                        hour12: true
+                    })}";
+                    
                 } else {
                     tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No data available</td></tr>';
+                    lastUpdated.textContent = "Last Updated: N/A";
                 }
             } catch (err) {
                 console.error('Error fetching data:', err);
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error loading data. Please try again.</td></tr>';
+                lastUpdated.textContent = "Last Updated: Error";
             } finally {
                 loading.style.display = 'none';
             }
