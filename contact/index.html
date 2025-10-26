@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spawn Board</title>
+    <title>Spawn Board - Request Server</title>
 
     <meta name="title" content="Spawn Board - Request Server" />
     <meta name="description" content="" />
-    <meta property="og:type content="website" />
+    <meta property="og:type" content="website" />
     <meta property="og:url" content="https://spawnboard.pages.dev/" />
     <meta property="og:title" content="Spawn Board - Request Server" />
     <meta property="og:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
@@ -156,6 +156,131 @@
             color: #666;
             font-size: 14px;
         }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .nav-container {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme nav a {
+            color: #bbdefb;
+        }
+
+        .dark-theme nav a:hover {
+            background-color: #333;
+            color: #e3f2fd;
+        }
+
+        .dark-theme header {
+            border-bottom: 1px solid #333;
+        }
+
+        .dark-theme main {
+            background: #1e1e1e;
+        }
+
+        .dark-theme h1 {
+            color: #bbdefb;
+        }
+
+        .dark-theme p {
+            color: #ccc !important;
+        }
+
+        .dark-theme label {
+            color: #e0e0e0;
+        }
+
+        .dark-theme input[type="text"],
+        .dark-theme textarea {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+
+        .dark-theme input[type="text"]::placeholder,
+        .dark-theme textarea::placeholder {
+            color: #888;
+        }
+
+        .dark-theme button {
+            background-color: #0056b3;
+        }
+
+        .dark-theme button:hover {
+            background-color: #003d82;
+        }
+
+        .dark-theme footer {
+            border-top: 1px solid #333;
+            color: #ccc;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .toggle-container label {
+            font-size: 16px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            vertical-align: middle;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
     </style>
 </head>
 <body>
@@ -177,6 +302,14 @@
             Enter the invite code/link for your Discord server and a brief description. We'll review it and add it to our leaderboard if it fits!
         </p>
         
+        <div class="toggle-container">
+            <label for="dark-toggle">Dark Theme</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="dark-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
         <form action="https://formspree.io/f/mnnoabkr" method="POST">
             <label for="invite">Discord Invite Code/Link:</label>
             <input type="text" id="invite" name="invite" placeholder="e.g., https://discord.gg/abc123 or abc123" required>
@@ -192,5 +325,27 @@
     <footer>
         &copy; 2025 SpawnBoard. All rights reserved.
     </footer>
+
+    <script>
+        // Dark Theme Toggle
+        const darkToggle = document.getElementById('dark-toggle');
+
+        // Load saved theme preference
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            darkToggle.checked = true;
+        }
+
+        // Toggle event listener
+        darkToggle.addEventListener('change', () => {
+            if (darkToggle.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
 </body>
 </html>
