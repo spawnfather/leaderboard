@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spawn Board</title>
@@ -23,26 +22,6 @@
     <meta property="twitter:description" content="The leaderboard of active Spawnism communities compared by their member counts displayed in an easy to understand format." />
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-    <script>
-        (function() {
-            if (localStorage.getItem('darkTheme') === 'true') {
-                document.documentElement.classList.add('dark-theme');
-            }
-          
-        // Auto-sync toggle if it exists
-            const toggle = document.getElementById('dark-toggle');
-            if (toggle) {
-                toggle.checked = localStorage.getItem('darkTheme') === 'true';
-                toggle.addEventListener('change', () => {
-                    const enabled = toggle.checked; 
-                    document.documentElement.classList.toggle('dark-theme', enabled);
-                    localStorage.setItem('darkTheme', enabled);
-                 });
-            }
-        })();
-    </script>
-    
     <style>
 
         .nav-container {
@@ -223,7 +202,7 @@
         }
 
         /* Dark Theme Styles */
-        .dark-theme {
+        body.dark-theme {
             background-color: #121212;
             color: #e0e0e0;
         }
@@ -487,22 +466,21 @@
         refreshBtn.addEventListener('click', fetchAndDisplayData);
 
         // Dark Theme Toggle
-        // Dark Theme Toggle
         const darkToggle = document.getElementById('dark-toggle');
 
-        // Load saved preference
+        // Load saved theme preference
         if (localStorage.getItem('darkTheme') === 'true') {
-            document.documentElement.classList.add('dark-theme');
+            document.body.classList.add('dark-theme');
             darkToggle.checked = true;
         }
 
-        // Toggle event
+        // Toggle event listener
         darkToggle.addEventListener('change', () => {
             if (darkToggle.checked) {
-                document.documentElement.classList.add('dark-theme');
+                document.body.classList.add('dark-theme');
                 localStorage.setItem('darkTheme', 'true');
             } else {
-                document.documentElement.classList.remove('dark-theme');
+                document.body.classList.remove('dark-theme');
                 localStorage.setItem('darkTheme', 'false');
             }
         });
