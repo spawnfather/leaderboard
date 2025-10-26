@@ -23,6 +23,59 @@
     <!-- Assuming your site has a global stylesheet; adjust the path as needed -->
     <link rel="stylesheet" href="/styles.css">
     <style>
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav ul {
+            margin: 0;
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        nav a:hover {
+            background-color: #e7f1ff;
+            color: #0056b3;
+        }
+
+        @media (max-width: 760px) {
+            .nav-container {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+                gap: 12px;
+        }
+
+            nav ul {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+        }
+        
         /* Basic fallback styles to match a modern, clean design (light theme with blue accents).
            Adjust if your global CSS overrides these. */
         body {
@@ -108,13 +161,14 @@
 <body>
     <!-- Header and Navigation: Replicate your site's nav structure here -->
     <header>
-        <nav>
-            <ul>
-                <li><a href="/leaderboard">Leaderboard</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <!-- Add more nav items as per your site's scheme -->
-            </ul>
-        </nav>
+        <div class="nav-container">
+            <nav>
+                <ul>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <main>
