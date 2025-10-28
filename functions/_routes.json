@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "externals": [
+    "@supabase/supabase-js"
+  ]
+}
