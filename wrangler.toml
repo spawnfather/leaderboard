@@ -1,9 +1,11 @@
 name = "spawnboard-leaderboard"
 compatibility_date = "2025-10-28"
 
+pages_build_output_dir = "."
+
+[vars]
+# Optional: Add if needed later
+
 [functions]
 directory = "functions"
-
-[[functions]]
-  # This enables npm install
-  node_compat = true
+node_compat = true
