@@ -1,0 +1,9 @@
+name = "spawnboard-leaderboard"
+compatibility_date = "2025-10-28"
+
+[functions]
+directory = "functions"
+
+[[functions]]
+  # This enables npm install
+  node_compat = true
