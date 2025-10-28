@@ -1,4 +1,4 @@
-import { supabase } from '../_supabase.js';
+import { supabase } from '../../../_supabase.js';
 function json(payload, status = 200) {
   return new Response(JSON.stringify(payload, null, 2), {
     status,
