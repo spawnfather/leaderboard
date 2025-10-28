@@ -355,7 +355,7 @@
             <nav>
                 <ul>
                     <li><a href="/leaderboard">Leaderboard</a></li>
-                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/submit">Submit Server</a></li>
                 </ul>
             </nav>
         </div>
@@ -434,7 +434,7 @@
                             <td>${rank} ${getMedal(rank)}</td>
                             <td>${item.server_name}</td>
                             <td>${item.member_count}</td>
-                            <td>${item.invite_code}</td>
+                            <td><a href="https://discord.gg/${item.invite_code}" target="_blank">${item.invite_code}</a></td>
                         `;
                         tbody.appendChild(row);
                     });
