@@ -429,13 +429,32 @@
                     data.forEach((item, index) => {
                         const row = document.createElement('tr');
                         const rank = index + 1;
-                        
-                        row.innerHTML = `
-                            <td>${rank} ${getMedal(rank)}</td>
-                            <td>${item.server_name}</td>
-                            <td>${item.member_count}</td>
-                            <td><a href="https://discord.gg/${item.invite_code}" target="_blank">${item.invite_code}</a></td>
-                        `;
+
+
+                        const rankTd = document.createElement('td');
+                        rankTd.textContent = `${rank} ${getMedal(rank)}`;
+                        row.appendChild(rankTd);
+
+                        // Server name cell (this is where XSS is prevented via textContent)
+                        const nameTd = document.createElement('td');
+                        nameTd.textContent = item.server_name;
+                        row.appendChild(nameTd);
+
+                        // Member count cell
+                        const countTd = document.createElement('td');
+                        countTd.textContent = item.member_count;
+                        row.appendChild(countTd);
+
+                        // Invite code cell with link
+                        const inviteTd = document.createElement('td');
+                        const inviteLink = document.createElement('a');
+                        inviteLink.href = `https://discord.gg/${encodeURIComponent(item.invite_code)}`; // URI-encode for safety
+                        inviteLink.target = '_blank';
+                        inviteLink.rel = 'noopener noreferrer'; // Add for security (prevents tabnabbing)
+                        inviteLink.textContent = item.invite_code;
+                        inviteTd.appendChild(inviteLink);
+                        row.appendChild(inviteTd);
+
                         tbody.appendChild(row);
                     });
 
