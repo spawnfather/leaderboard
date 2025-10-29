@@ -57,7 +57,7 @@
                     <th>Rank</th>
                     <th>Server Name</th>
                     <th>Member Count</th>
-                    <th>Invite Code</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -123,17 +123,16 @@
                         countTd.textContent = item.member_count;
                         row.appendChild(countTd);
 
-                        // Invite code cell with link
+                        // Invite code cell with a "Join Server" button
                         const inviteTd = document.createElement('td');
-                        const inviteLink = document.createElement('a');
-                        inviteLink.href = `https://discord.gg/${encodeURIComponent(item.invite_code)}`; // URI-encode for safety
-                        inviteLink.target = '_blank';
-                        inviteLink.rel = 'noopener noreferrer'; // Add for security (prevents tabnabbing)
-                        inviteLink.textContent = item.invite_code;
-                        inviteTd.appendChild(inviteLink);
+                        const joinBtn = document.createElement('a');
+                        joinBtn.href = `https://discord.gg/${encodeURIComponent(item.invite_code)}`;
+                        joinBtn.target = '_blank';
+                        joinBtn.rel = 'noopener noreferrer';
+                        joinBtn.className = 'join-btn';
+                        joinBtn.textContent = 'Join Server';
+                        inviteTd.appendChild(joinBtn);
                         row.appendChild(inviteTd);
-
-                        tbody.appendChild(row);
                     });
 
                     const maxUpdated = data.reduce((max, item) => 
