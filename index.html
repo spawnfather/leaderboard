@@ -104,36 +104,45 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
+                    // ---- REPLACE THE ENTIRE data.forEach(...) BLOCK WITH THIS ----
                     data.forEach((item, index) => {
-                        const row = document.createElement('tr');
-                        const rank = index + 1;
+                    const row = document.createElement('tr');
+                    const rank = index + 1;
 
+                    // Rank + medal
+                    const rankTd = document.createElement('td');
+                    rankTd.textContent = `${rank} ${getMedal(rank)}`;
+                    row.appendChild(rankTd);
 
-                        const rankTd = document.createElement('td');
-                        rankTd.textContent = `${rank} ${getMedal(rank)}`;
-                        row.appendChild(rankTd);
+                    // Server name (XSS-safe)
+                    const nameTd = document.createElement('td');
+                    nameTd.textContent = item.server_name || '—';
+                    row.appendChild(nameTd);
 
-                        // Server name cell (this is where XSS is prevented via textContent)
-                        const nameTd = document.createElement('td');
-                        nameTd.textContent = item.server_name;
-                        row.appendChild(nameTd);
+                    // Member count
+                    const countTd = document.createElement('td');
+                    countTd.textContent = item.member_count ?? '—';
+                    row.appendChild(countTd);
 
-                        // Member count cell
-                        const countTd = document.createElement('td');
-                        countTd.textContent = item.member_count;
-                        row.appendChild(countTd);
+                    // ---------- NEW "Join Server" BUTTON ----------
+                    const inviteTd = document.createElement('td');
 
-                        // Invite code cell with a "Join Server" button
-                        const inviteTd = document.createElement('td');
+                    // Guard against missing/empty invite codes
+                    const inviteCode = (item.invite_code || '').trim();
+                    if (inviteCode) {
                         const joinBtn = document.createElement('a');
-                        joinBtn.href = `https://discord.gg/${encodeURIComponent(item.invite_code)}`;
+                        joinBtn.href = `https://discord.gg/${encodeURIComponent(inviteCode)}`;
                         joinBtn.target = '_blank';
                         joinBtn.rel = 'noopener noreferrer';
                         joinBtn.className = 'join-btn';
                         joinBtn.textContent = 'Join Server';
                         inviteTd.appendChild(joinBtn);
-                        row.appendChild(inviteTd);
-                    });
+                     } else {
+                        inviteTd.textContent = '—';
+                    }
+                    row.appendChild(inviteTd);
+                    tbody.appendChild(row);
+                });
 
                     const maxUpdated = data.reduce((max, item) => 
                         (item.last_updated > max ? item.last_updated : max), 
