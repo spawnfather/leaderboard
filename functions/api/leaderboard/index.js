@@ -1,4 +1,4 @@
-// functions/api/leaderboard/[...all].js
+// functions/api/leaderboard/index.js
 function buildUrl(SUPABASE_URL, limit) {
   const base = `${SUPABASE_URL}/rest/v1/leaderboardmain`;
   const params = new URLSearchParams({
@@ -12,16 +12,19 @@ function buildUrl(SUPABASE_URL, limit) {
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
+  const path = url.pathname;
+
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = env;
 
   // /api/leaderboard/all
-  if (url.pathname === '/api/leaderboard/all') {
+  if (path === '/api/leaderboard/all') {
     const res = await fetch(buildUrl(SUPABASE_URL, null), {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
     });
+    if (!res.ok) return new Response(JSON.stringify({ error: 'Supabase error' }), { status: 500 });
     const data = await res.json();
     return new Response(JSON.stringify({ success: true, data, count: data.length }), {
       headers: { 'Content-Type': 'application/json' },
@@ -29,11 +32,11 @@ export async function onRequest(context) {
   }
 
   // /api/leaderboard/top/10
-  const match = url.pathname.match(/^\/api\/leaderboard\/top\/(\d+)$/);
+  const match = path.match(/^\/api\/leaderboard\/top\/(\d+)$/);
   if (match) {
     const num = parseInt(match[1], 10);
     if (num < 1 || num > 10000) {
-      return new Response(JSON.stringify({ success: false, error: 'Invalid number' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Number must be 1-10000' }), { status: 400 });
     }
     const res = await fetch(buildUrl(SUPABASE_URL, num), {
       headers: {
@@ -41,11 +44,13 @@ export async function onRequest(context) {
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
     });
+    if (!res.ok) return new Response(JSON.stringify({ error: 'Supabase error' }), { status: 500 });
     const data = await res.json();
     return new Response(JSON.stringify({ success: true, data, count: data.length, requested: num }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  return new Response(JSON.stringify({ success: false, error: 'Not found' }), { status: 404 });
+  // 404
+  return new Response(JSON.stringify({ error: 'Not found' }), { status: 404 });
 }
