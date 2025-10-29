@@ -319,3 +319,29 @@
                 color: #e0e0e0;
             }
         }
+
+/* Add this anywhere in your styles.css (e.g. after the #refresh-btn styles) */
+.join-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+.join-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Dark-theme version */
+.dark-theme .join-btn {
+    background-color: #bbdefb;
+    color: #121212;
+}
+.dark-theme .join-btn:hover {
+    background-color: #90caf9;
+}
