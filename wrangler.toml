@@ -1,0 +1,6 @@
+name = "your-pages-project"  # optional, matches your Pages project name
+compatibility_date = "2025-10-31"  # current date or later
+
+[functions]
+# Enable Node.js compatibility for all Functions
+node_compat = true
