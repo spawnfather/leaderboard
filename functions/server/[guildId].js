@@ -1,63 +1,39 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-
 const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
 
-let supabaseClient = null;
-
-function getSupabase() {
-  if (!supabaseClient) {
-    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-  return supabaseClient;
-}
-
 export async function onRequest({ params }) {
+  const guildId = params.guildId;
+
+  // Try to get from Supabase
   try {
-    const guildId = params.guildId;
-    const supabase = getSupabase();
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?guild_id=eq.${guildId}&select=*`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-    const { data: server, error } = await supabase
-      .from('servers')
-      .select('guild_id, server_name, member_count, server_desc, online_count, last_updated')
-      .eq('guild_id', guildId)
-      .single();
-
-    if (error || !server) {
-      return new Response(notFoundHTML(), {
-        status: 404,
-        headers: { 'Content-Type': 'text/html' },
-      });
+    if (!res.ok || res.status === 204) {
+      return new Response(notFoundHTML(), { status: 404, headers: { 'Content-Type': 'text/html' } });
     }
 
-    return new Response(renderServerHTML(server), {
-      headers: { 'Content-Type': 'text/html' },
-    });
+    const [server] = await res.json();
+    if (!server) {
+      return new Response(notFoundHTML(), { status: 404, headers: { 'Content-Type': 'text/html' } });
+    }
+
+    return new Response(renderPage(server), { headers: { 'Content-Type': 'text/html' } });
   } catch (err) {
-    console.error('Error:', err);
-    return new Response(errorHTML(err.message), {
-      status: 500,
-      headers: { 'Content-Type': 'text/html' },
-    });
+    console.error(err);
+    return new Response(errorHTML(), { status: 500, headers: { 'Content-Type': 'text/html' } });
   }
 }
 
 // ──────────────────────────────────────────────────────────────
-// HTML Templates
+// HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
-function notFoundHTML() {
-  return `<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><title>404</title>
-<link rel="stylesheet" href="/template/styles.css">
-</head><body>
-<div class="container" style="text-align:center;padding:4rem;">
-  <h1>404</h1><p>Server not found.</p>
-  <a href="/" style="color:#007bff;">Back to Leaderboard</a>
-</div>
-</body></html>`;
-}
-
-function renderServerHTML(s) {
+function renderPage(s) {
   const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
@@ -65,15 +41,24 @@ function renderServerHTML(s) {
   });
 
   return `<!DOCTYPE html>
-<html lang="en"><head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(s.server_name)} – Spawn Board</title>
   <link rel="stylesheet" href="/template/styles.css">
-</head><body>
-  <header><div class="nav-container"><nav><ul>
-    <li><a href="/">Leaderboard</a></li>
-    <li><a href="/submit">Submit Server</a></li>
-  </ul></nav></div></header>
+  <!-- Load Supabase IIFE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <nav><ul>
+        <li><a href="/">Leaderboard</a></li>
+        <li><a href="/submit">Submit Server</a></li>
+      </ul></nav>
+    </div>
+  </header>
 
   <div class="toggle-container">
     <label for="dark-toggle">Dark Theme</label>
@@ -97,6 +82,7 @@ function renderServerHTML(s) {
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
 
   <script>
+    // Dark mode
     const t = document.getElementById('dark-toggle');
     if (localStorage.getItem('darkTheme') === 'true') {
       document.body.classList.add('dark-theme'); t.checked = true;
@@ -106,13 +92,24 @@ function renderServerHTML(s) {
       localStorage.setItem('darkTheme', t.checked);
     });
   </script>
-</body></html>`;
+</body>
+</html>`;
 }
 
-function errorHTML(msg) {
-  return `<!DOCTYPE html><html><head><title>Error</title><link rel="stylesheet" href="/template/styles.css"></head>
+function notFoundHTML() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>404</title><link rel="stylesheet" href="/template/styles.css"></head>
 <body><div class="container" style="text-align:center;padding:4rem;">
-  <h1>Error</h1><p>${esc(msg)}</p>
+  <h1>404</h1><p>Server not found.</p>
+  <a href="/" style="color:#007bff;">Back</a>
+</div></body></html>`;
+}
+
+function errorHTML() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Error</title><link rel="stylesheet" href="/template/styles.css"></head>
+<body><div class="container" style="text-align:center;padding:4rem;">
+  <h1>Error</h1><p>Could not load server.</p>
   <a href="/" style="color:#007bff;">Back</a>
 </div></body></html>`;
 }
