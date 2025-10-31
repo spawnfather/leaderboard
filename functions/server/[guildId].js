@@ -1,34 +1,60 @@
-// functions/server/[guildId].js
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+// ──────────────────────────────────────────────────────────────
+//  functions/server/[guildId].js
+//  No npm, no build step – works on mobile
+// ──────────────────────────────────────────────────────────────
 
-const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
+// 1. Load the IIFE build of Supabase (once per isolate)
+const SUPABASE_SCRIPT = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js';
+let supabaseClient = null;
 
-export const onRequest = async ({ params }) => {
+async function getSupabase() {
+  if (supabaseClient) return supabaseClient;
+
+  // Workers cannot use <script> tags, so we fetch the script and eval it
+  const res = await fetch(SUPABASE_SCRIPT);
+  const code = await res.text();
+  // Create a tiny function scope so `Supabase` is defined
+  const init = new Function(code + '; return Supabase;');
+  const Supabase = init();
+
+  const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
+
+  supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return supabaseClient;
+}
+
+// ──────────────────────────────────────────────────────────────
+// 2. Main request handler
+// ──────────────────────────────────────────────────────────────
+export async function onRequest({ params }) {
   const guildId = params.guildId;
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = await getSupabase();
   const { data: server, error } = await supabase
     .from('leaderboardmain')
     .select('guild_id, server_name, member_count, server_desc, online_count, last_updated')
     .eq('guild_id', guildId)
     .single();
 
-  // 404 Page
+  // ───── 404 ─────
   if (error || !server) {
-    return new Response(get404Page(), {
+    return new Response(notFoundHTML(), {
       status: 404,
       headers: { 'Content-Type': 'text/html' },
     });
   }
 
-  return new Response(renderServerPage(server), {
+  // ───── Render page ─────
+  return new Response(renderServerHTML(server), {
     headers: { 'Content-Type': 'text/html' },
   });
-};
+}
 
-// 404 Page using template/styles.css
-function get404Page() {
+// ──────────────────────────────────────────────────────────────
+// 3. HTML templates (uses your existing /template/styles.css)
+// ──────────────────────────────────────────────────────────────
+function notFoundHTML() {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,25 +90,19 @@ function get404Page() {
 
   <script>
     const t = document.getElementById('dark-toggle');
-    if (localStorage.getItem('darkTheme') === 'true') {
-      document.body.classList.add('dark-theme'); t.checked = true;
-    }
-    t.addEventListener('change', () => {
-      document.body.classList.toggle('dark-theme', t.checked);
-      localStorage.setItem('darkTheme', t.checked);
-    });
+    if (localStorage.getItem('darkTheme')==='true') { document.body.classList.add('dark-theme'); t.checked=true; }
+    t.addEventListener('change',()=>{ document.body.classList.toggle('dark-theme',t.checked); localStorage.setItem('darkTheme',t.checked); });
   </script>
 </body>
 </html>`;
 }
 
-// Server Page — uses template/styles.css
-function renderServerPage(server) {
-  const iconUrl = `https://cdn.discordapp.com/icons/${server.guild_id}/${server.guild_id}.webp?size=256`;
+function renderServerHTML(s) {
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
-  const updated = new Date(server.last_updated).toLocaleString('en-US', {
-    year: 'numeric', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+  const updated = new Date(s.last_updated).toLocaleString('en-US', {
+    year:'numeric', month:'short', day:'numeric',
+    hour:'2-digit', minute:'2-digit'
   });
 
   return `<!DOCTYPE html>
@@ -90,10 +110,10 @@ function renderServerPage(server) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${e(server.server_name)} – Spawn Board</title>
-  <meta property="og:title" content="${e(server.server_name)}">
-  <meta property="og:description" content="${e(server.server_desc || 'Discord server on Spawn Board')}">
-  <meta property="og:image" content="${iconUrl}">
+  <title>${esc(s.server_name)} – Spawn Board</title>
+  <meta property="og:title" content="${esc(s.server_name)}">
+  <meta property="og:description" content="${esc(s.server_desc||'Discord server on Spawn Board')}">
+  <meta property="og:image" content="${icon}">
   <link rel="stylesheet" href="/template/styles.css">
 </head>
 <body>
@@ -115,16 +135,16 @@ function renderServerPage(server) {
   </div>
 
   <div class="container" style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;">
-    <img src="${iconUrl}" onerror="this.src='${fallback}'"
-         alt="${e(server.server_name)}" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
+    <img src="${icon}" onerror="this.src='${fallback}'"
+         alt="${esc(s.server_name)}" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
-      <h1>${e(server.server_name)}</h1>
-      <p><strong>Members:</strong> ${server.member_count.toLocaleString()}</p>
-      <p><strong>Online:</strong> ${server.online_count.toLocaleString()}</p>
+      <h1>${esc(s.server_name)}</h1>
+      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
+      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
       <p><strong>Last Updated:</strong> ${updated}</p>
-      ${server.server_desc ? `<p>${e(server.server_desc)}</p>` : ''}
+      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
       <p>
-        <a href="https://discord.com/servers/${server.guild_id}" target="_blank" rel="noopener"
+        <a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener"
            style="color:#007bff;font-weight:600;">View on Discord</a>
       </p>
     </div>
@@ -134,20 +154,14 @@ function renderServerPage(server) {
 
   <script>
     const t = document.getElementById('dark-toggle');
-    if (localStorage.getItem('darkTheme') === 'true') {
-      document.body.classList.add('dark-theme'); t.checked = true;
-    }
-    t.addEventListener('change', () => {
-      document.body.classList.toggle('dark-theme', t.checked);
-      localStorage.setItem('darkTheme', t.checked);
-    });
+    if (localStorage.getItem('darkTheme')==='true') { document.body.classList.add('dark-theme'); t.checked=true; }
+    t.addEventListener('change',()=>{ document.body.classList.toggle('dark-theme',t.checked); localStorage.setItem('darkTheme',t.checked); });
   </script>
 </body>
 </html>`;
 }
 
-function e(str) {
-  return String(str || '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  })[c]);
+// Tiny HTML escaper
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
 }
