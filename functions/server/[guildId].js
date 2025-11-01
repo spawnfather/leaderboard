@@ -40,7 +40,7 @@ function renderPage(s) {
   const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-  console.log(icon)
+  console.log("Logo URL: " + logo)
 
   // ──────────────────────────────────────────────────────
   // 2. HTML-attribute-safe escaping for the two URLs
