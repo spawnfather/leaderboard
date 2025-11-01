@@ -34,27 +34,8 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  // ──────────────────────────────────────────────────────
-  // 1. Build the *real* Discord CDN URL (you already have it)
-  // ──────────────────────────────────────────────────────
-  const icon = `https://cdn.discordapp.com/icons/${guildId}/${s.icon_hash}.webp?size=256`;
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
-
-  console.log("Logo URL: " + logo)
-
-  // ──────────────────────────────────────────────────────
-  // 2. HTML-attribute-safe escaping for the two URLs
-  // ──────────────────────────────────────────────────────
-  const escAttr = str => String(str).replace(/&/g, '&amp;')
-                                   .replace(/'/g, '&#39;')
-                                   .replace(/"/g, '&quot;');
-
-  const safeIcon     = escAttr(icon);
-  const safeFallback = escAttr(fallback);
-
-  // ──────────────────────────────────────────────────────
-  // 3. Rest of the page (unchanged except the <img>)
-  // ──────────────────────────────────────────────────────
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
@@ -66,6 +47,7 @@ function renderPage(s) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(s.server_name)} – Spawn Board</title>
   <link rel="stylesheet" href="/template/styles.css">
+  <!-- Load Supabase IIFE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -86,26 +68,21 @@ function renderPage(s) {
   </div>
 
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
-    <!--  THE ONLY CHANGE  -->
-    <img src="${icon}"
-         onerror="this.src='${safeFallback}'"
-         alt="${esc(s.server_name)} icon"
-         style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
-
+    <img src="${icon}" onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
       <h1>${esc(s.server_name)}</h1>
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
       <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
       <p><strong>Updated:</strong> ${updated}</p>
       ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
-      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener"
-            style="color:#007bff;font-weight:600;">View on Discord</a></p>
+      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
     </div>
   </div>
 
-  <footer>© 2025 SpawnBoard. All rights reserved.</footer>
+  <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
 
   <script>
+    // Dark mode
     const t = document.getElementById('dark-toggle');
     if (localStorage.getItem('darkTheme') === 'true') {
       document.body.classList.add('dark-theme'); t.checked = true;
