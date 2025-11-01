@@ -34,6 +34,8 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
+  const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
@@ -66,6 +68,7 @@ function renderPage(s) {
   </div>
 
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
+    <img src="${icon}" onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
       <h1>${esc(s.server_name)}</h1>
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
@@ -73,6 +76,11 @@ function renderPage(s) {
       <p><strong>Updated:</strong> ${updated}</p>
       ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
       <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
+      <div style="display:flex;gap:1rem;margin-top:1rem;">
+        <button onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
+        <button onclick="copyToClipboard('${esc(s.guild_id)}')">Copy Server ID</button>
+        <button onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite Code</button>
+      </div>
     </div>
   </div>
 
@@ -88,6 +96,16 @@ function renderPage(s) {
       document.body.classList.toggle('dark-theme', t.checked);
       localStorage.setItem('darkTheme', t.checked);
     });
+
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy.');
+      });
+    }
   </script>
 </body>
 </html>`;
