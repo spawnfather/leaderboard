@@ -1,132 +1,121 @@
-export async function onRequestGet({ env }) {
-  const SUPABASE_URL = env.SUPABASE_URL;
-  const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
 
-  return new Response(`
-<!DOCTYPE html>
+export async function onRequest({ params }) {
+  const guildId = params.guildId;
+
+  // Try to get from Supabase
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?guild_id=eq.${guildId}&select=*`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok || res.status === 204) {
+      return new Response(notFoundHTML(), { status: 404, headers: { 'Content-Type': 'text/html' } });
+    }
+
+    const [server] = await res.json();
+    if (!server) {
+      return new Response(notFoundHTML(), { status: 404, headers: { 'Content-Type': 'text/html' } });
+    }
+
+    return new Response(renderPage(server), { headers: { 'Content-Type': 'text/html' } });
+  } catch (err) {
+    console.error(err);
+    return new Response(errorHTML(), { status: 500, headers: { 'Content-Type': 'text/html' } });
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// HTML with inline Supabase client (IIFE) + fetch
+// ──────────────────────────────────────────────────────────────
+function renderPage(s) {
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
+  const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
+  const updated = new Date(s.last_updated).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Server Profile</title>
-  <link rel="stylesheet" href="/styles.css" />
-
-  <!-- Supabase Client (UMD version) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${esc(s.server_name)} – Spawn Board</title>
+  <link rel="stylesheet" href="/template/styles.css">
+  <!-- Load Supabase IIFE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-
-  <style>
-    .profile-container { max-width: 980px; margin: 24px auto; padding: 24px; border-radius: 12px; background: white; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
-    .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
-    .server-badge { width: 96px; height: 96px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; background: linear-gradient(135deg, #007bff 0%, #00b4ff 100%); overflow: hidden; }
-    .server-badge img { width: 100%; height: 100%; object-fit: cover; }
-    .server-name { font-size: 22px; font-weight: 700; margin: 0 0 6px 0; }
-    .stats { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
-    .stat { background: rgba(0,123,255,0.06); border-radius: 8px; padding: 10px 12px; font-weight: 600; font-size: 14px; color: #007bff; }
-    .actions { display:flex; gap:12px; align-items:center; margin-left:auto; }
-    .btn { padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; background:#007bff; color:white; text-decoration:none; }
-    .btn.secondary { background:transparent; color:#007bff; border:1px solid rgba(0,123,255,0.16); }
-    .description { margin-top:14px; color:#333; line-height:1.5; }
-  </style>
 </head>
 <body>
-  <div class="nav-container">
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/servers">Servers</a></li>
-      </ul>
-    </nav>
+  <header>
+    <div class="nav-container">
+      <nav><ul>
+        <li><a href="/">Leaderboard</a></li>
+        <li><a href="/submit">Submit Server</a></li>
+      </ul></nav>
+    </div>
+  </header>
+
+  <div class="toggle-container">
+    <label for="dark-toggle">Dark Theme</label>
+    <label class="toggle-switch">
+      <input type="checkbox" id="dark-toggle"><span class="slider"></span>
+    </label>
   </div>
 
-  <main class="profile-container">
-    <div class="profile-header">
-      <div class="server-badge" id="serverBadge">?</div>
-
-      <div>
-        <h1 class="server-name" id="serverName">Loading...</h1>
-        <div class="stats">
-          <div class="stat" id="memberCount">Members: —</div>
-          <div class="stat" id="onlineCount">Online: —</div>
-          <div class="stat" id="lastUpdated">Updated: —</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <a id="joinBtn" href="#" target="_blank" class="btn">Join Server</a>
-        <button id="copyInviteBtn" class="btn secondary">Copy Invite</button>
-        <button id="copyIdBtn" class="btn secondary">Copy ID</button>
-      </div>
+  <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
+    <img src="${icon}" onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
+    <div style="flex:1;min-width:260px;">
+      <h1>${esc(s.server_name)}</h1>
+      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
+      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
+      <p><strong>Updated:</strong> ${updated}</p>
+      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
+      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
     </div>
+  </div>
 
-    <section>
-      <h2>About</h2>
-      <p class="description" id="serverDesc">Loading description...</p>
-    </section>
-  </main>
+  <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
 
   <script>
-    // Inject environment variables from Cloudflare Pages
-    window.SUPABASE_URL = "${SUPABASE_URL}";
-    window.SUPABASE_ANON_KEY = "${SUPABASE_ANON_KEY}";
-  </script>
-
-  <script>
-    (async function () {
-      const SUPABASE_URL = window.SUPABASE_URL;
-      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
-      const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      const guildId = window.location.pathname.split('/').pop();
-
-      const { data, error } = await supabase
-        .from('leaderboardmain')
-        .select('*')
-        .eq('guild_id', guildId)
-        .maybeSingle();
-
-      if (error || !data) {
-        document.getElementById('serverName').textContent = 'Server not found';
-        document.getElementById('serverDesc').textContent = 'No data available.';
-        console.error(error);
-        return;
-      }
-
-      const server = data;
-      const inviteUrl = 'https://discord.gg/' + (server.invite_code || guildId);
-
-      document.getElementById('serverName').textContent = server.server_name;
-      document.getElementById('memberCount').textContent = 'Members: ' + (server.member_count ?? '—');
-      document.getElementById('onlineCount').textContent = 'Online: ' + (server.online_count ?? '—');
-      document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date(server.last_updated).toLocaleDateString();
-      document.getElementById('serverDesc').textContent = server.server_desc || 'No description provided.';
-
-      const badge = document.getElementById('serverBadge');
-      if (server.icon_hash) {
-        const img = document.createElement('img');
-        img.src = \`https://cdn.discordapp.com/icons/\${server.guild_id}/\${server.icon_hash}.png?size=128\`;
-        img.alt = server.server_name;
-        img.onerror = () => badge.textContent = server.server_name[0].toUpperCase();
-        badge.textContent = '';
-        badge.appendChild(img);
-      } else {
-        badge.textContent = server.server_name[0].toUpperCase();
-      }
-
-      const joinBtn = document.getElementById('joinBtn');
-      joinBtn.href = inviteUrl;
-
-      document.getElementById('copyInviteBtn').onclick = () => {
-        navigator.clipboard.writeText(inviteUrl);
-        alert('Invite link copied!');
-      };
-
-      document.getElementById('copyIdBtn').onclick = () => {
-        navigator.clipboard.writeText(server.guild_id);
-        alert('Server ID copied!');
-      };
-    })();
+    // Dark mode
+    const t = document.getElementById('dark-toggle');
+    if (localStorage.getItem('darkTheme') === 'true') {
+      document.body.classList.add('dark-theme'); t.checked = true;
+    }
+    t.addEventListener('change', () => {
+      document.body.classList.toggle('dark-theme', t.checked);
+      localStorage.setItem('darkTheme', t.checked);
+    });
   </script>
 </body>
-</html>
-  `, { headers: { 'Content-Type': 'text/html' } })
+</html>`;
+}
+
+function notFoundHTML() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>404</title><link rel="stylesheet" href="/template/styles.css"></head>
+<body><div class="container" style="text-align:center;padding:4rem;">
+  <h1>404</h1><p>Server not found.</p>
+  <a href="/" style="color:#007bff;">Back</a>
+</div></body></html>`;
+}
+
+function errorHTML() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Error</title><link rel="stylesheet" href="/template/styles.css"></head>
+<body><div class="container" style="text-align:center;padding:4rem;">
+  <h1>Error</h1><p>Could not load server.</p>
+  <a href="/" style="color:#007bff;">Back</a>
+</div></body></html>`;
+}
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[c]);
 }
