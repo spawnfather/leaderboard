@@ -85,7 +85,7 @@ function renderPage(s) {
 
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
     <!--  THE ONLY CHANGE  -->
-    <img src="${safeIcon}"
+    <img src="${icon}"
          onerror="this.src='${safeFallback}'"
          alt="${esc(s.server_name)} icon"
          style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
