@@ -1,41 +1,16 @@
-import { createClient } from "https://unpkg.com/@supabase/supabase-js@2.46.1/dist/esm/index.js";
-
-export async function onRequestGet({ params, env }) {
-  const { guildId } = params
-
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
-  const { data, error } = await supabase
-    .from('leaderboardmain')
-    .select('*')
-    .eq('guild_id', guildId)
-    .maybeSingle()
-
-  if (error || !data) {
-    return new Response(
-      `<h1>Server not found</h1><p>${error?.message || 'No data found for this guild ID.'}</p>`,
-      { status: 404, headers: { 'Content-Type': 'text/html' } }
-    )
-  }
-
-  return new Response(renderPage(data), {
-    headers: { 'Content-Type': 'text/html' },
-  })
-}
-
-function renderPage(server) {
-  const inviteUrl = `https://discord.gg/${server.invite_code || server.guild_id}`
-  const iconUrl = server.icon_hash
-    ? `https://cdn.discordapp.com/icons/${server.guild_id}/${server.icon_hash}.png?size=128`
-    : null
-  const formattedDate = new Date(server.last_updated).toLocaleDateString()
-
-  return `<!DOCTYPE html>
+export async function onRequestGet() {
+  return new Response(`
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${server.server_name}</title>
+  <title>Server Profile</title>
   <link rel="stylesheet" href="/styles.css" />
+
+  <!-- Supabase Client (UMD version) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
   <style>
     .profile-container { max-width: 980px; margin: 24px auto; padding: 24px; border-radius: 12px; background: white; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
     .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
@@ -47,6 +22,7 @@ function renderPage(server) {
     .actions { display:flex; gap:12px; align-items:center; margin-left:auto; }
     .btn { padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; background:#007bff; color:white; text-decoration:none; }
     .btn.secondary { background:transparent; color:#007bff; border:1px solid rgba(0,123,255,0.16); }
+    .description { margin-top:14px; color:#333; line-height:1.5; }
     body.dark-theme .stat { background: rgba(187, 222, 251, 0.06); color: #bbdefb; }
     body.dark-theme .server-badge { background: linear-gradient(135deg, #6c63ff 0%, #00b4ff 100%); }
   </style>
@@ -63,35 +39,95 @@ function renderPage(server) {
 
   <main class="profile-container">
     <div class="profile-header">
-      <div class="server-badge">
-        ${
-          iconUrl
-            ? `<img src="${iconUrl}" alt="${server.server_name} icon" />`
-            : server.server_name[0]?.toUpperCase() || '?'
-        }
-      </div>
+      <div class="server-badge" id="serverBadge">?</div>
 
       <div>
-        <h1 class="server-name">${server.server_name}</h1>
+        <h1 class="server-name" id="serverName">Loading...</h1>
         <div class="stats">
-          <div class="stat">Members: ${server.member_count ?? '—'}</div>
-          <div class="stat">Online: ${server.online_count ?? '—'}</div>
-          <div class="stat">Updated: ${formattedDate}</div>
+          <div class="stat" id="memberCount">Members: —</div>
+          <div class="stat" id="onlineCount">Online: —</div>
+          <div class="stat" id="lastUpdated">Updated: —</div>
         </div>
       </div>
 
       <div class="actions">
-        <a href="${inviteUrl}" target="_blank" class="btn">Join Server</a>
-        <button class="btn secondary" onclick="navigator.clipboard.writeText('${inviteUrl}')">Copy Invite</button>
-        <button class="btn secondary" onclick="navigator.clipboard.writeText('${server.guild_id}')">Copy ID</button>
+        <a id="joinBtn" href="#" target="_blank" class="btn">Join Server</a>
+        <button id="copyInviteBtn" class="btn secondary">Copy Invite</button>
+        <button id="copyIdBtn" class="btn secondary">Copy ID</button>
       </div>
     </div>
 
     <section>
       <h2>About</h2>
-      <p>${server.server_desc || 'No description provided.'}</p>
+      <p class="description" id="serverDesc">Loading description...</p>
     </section>
   </main>
+
+  <script>
+    (async function () {
+      // Create Supabase client from environment variables
+      const SUPABASE_URL = '${SUPABASE_URL}';
+      const SUPABASE_ANON_KEY = '${SUPABASE_ANON_KEY}';
+      const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Extract guild ID from the URL
+      const guildId = window.location.pathname.split('/').pop();
+
+      // Fetch the server info
+      const { data, error } = await supabase
+        .from('leaderboardmain')
+        .select('*')
+        .eq('guild_id', guildId)
+        .maybeSingle();
+
+      if (error || !data) {
+        document.getElementById('serverName').textContent = 'Server not found';
+        document.getElementById('serverDesc').textContent = 'No server data available.';
+        console.error(error);
+        return;
+      }
+
+      const server = data;
+      const inviteUrl = 'https://discord.gg/' + (server.invite_code || guildId);
+
+      // Fill in content
+      document.getElementById('serverName').textContent = server.server_name;
+      document.getElementById('memberCount').textContent = 'Members: ' + (server.member_count ?? '—');
+      document.getElementById('onlineCount').textContent = 'Online: ' + (server.online_count ?? '—');
+      document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date(server.last_updated).toLocaleDateString();
+      document.getElementById('serverDesc').textContent = server.server_desc || 'No description provided.';
+
+      // Server badge (icon or fallback)
+      const badge = document.getElementById('serverBadge');
+      if (server.icon_hash) {
+        const img = document.createElement('img');
+        img.src = \`https://cdn.discordapp.com/icons/\${server.guild_id}/\${server.icon_hash}.png?size=128\`;
+        img.alt = server.server_name;
+        img.onerror = () => badge.textContent = server.server_name[0].toUpperCase();
+        badge.textContent = '';
+        badge.appendChild(img);
+      } else {
+        badge.textContent = server.server_name[0].toUpperCase();
+      }
+
+      // Buttons
+      const joinBtn = document.getElementById('joinBtn');
+      joinBtn.href = inviteUrl;
+
+      document.getElementById('copyInviteBtn').onclick = () => {
+        navigator.clipboard.writeText(inviteUrl);
+        alert('Invite link copied!');
+      };
+
+      document.getElementById('copyIdBtn').onclick = () => {
+        navigator.clipboard.writeText(server.guild_id);
+        alert('Server ID copied!');
+      };
+    })();
+  </script>
 </body>
-</html>`
+</html>
+  `, {
+    headers: { 'Content-Type': 'text/html' },
+  })
 }
