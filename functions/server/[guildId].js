@@ -1,3 +1,6 @@
+const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
+
 export async function onRequestGet({ params }) {
   return new Response(`
 <!DOCTYPE html>
@@ -66,8 +69,6 @@ export async function onRequestGet({ params }) {
   <script>
     (async function () {
       // Create Supabase client from environment variables
-      const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
       const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       // Extract guild ID from the URL
