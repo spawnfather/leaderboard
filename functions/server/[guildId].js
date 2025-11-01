@@ -1,4 +1,4 @@
-export async function onRequestGet() {
+export async function onRequestGet({ params }) {
   return new Response(`
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +31,7 @@ export async function onRequestGet() {
   <div class="nav-container">
     <nav>
       <ul>
-        <li><a href="/">Home</a></li>
+        <li><a href="/">Leaderboard</a></li>
         <li><a href="/servers">Servers</a></li>
       </ul>
     </nav>
@@ -71,7 +71,7 @@ export async function onRequestGet() {
       const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       // Extract guild ID from the URL
-      const guildId = window.location.pathname.split('/').pop();
+      const guildId = params.guildId;
 
       // Fetch the server info
       const { data, error } = await supabase
