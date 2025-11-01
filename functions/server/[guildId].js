@@ -37,7 +37,7 @@ function renderPage(s) {
   // ──────────────────────────────────────────────────────
   // 1. Build the *real* Discord CDN URL (you already have it)
   // ──────────────────────────────────────────────────────
-  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`;
+  const icon = `https://cdn.discordapp.com/icons/${guildId}/${s.icon_hash}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
   console.log("Logo URL: " + logo)
