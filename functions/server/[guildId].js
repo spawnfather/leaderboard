@@ -68,7 +68,7 @@ function renderPage(s) {
   </div>
 
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
-    <img src="https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.png?size=128 onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
+    <img src=${icon} onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
       <h1>${esc(s.server_name)}</h1>
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
