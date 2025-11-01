@@ -104,10 +104,10 @@ function renderPage(s) {
 
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
   <script>
-  document.getElementById('serverName').textContent = data.server_name || 'Unknown Server';
-  document.getElementById('serverDesc').textContent = data.server_desc || 'No description available.';
-  document.getElementById('memberCount').textContent = data.member_count || '0';
-  document.getElementById('onlineCount').textContent = data.online_count || '0';
+  document.getElementById('serverName').textContent = s.server_name || 'Unknown Server';
+  document.getElementById('serverDesc').textContent = s.server_desc || 'No description available.';
+  document.getElementById('memberCount').textContent = s.member_count || '0';
+  document.getElementById('onlineCount').textContent = s.online_count || '0';
   document.getElementById('lastUpdated').textContent = new Date(data.last_updated).toLocaleString();
   document.getElementById('inviteButton').href = 'https://discord.gg/' + data.invite_code;
   </script>
