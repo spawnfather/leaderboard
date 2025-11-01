@@ -34,7 +34,10 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
+  const icon = s.icon_hash ? `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+  const banner = s.banner_hash ? `https://cdn.discordapp.com/banners/${s.guild_id}/${s.banner_hash}.webp?size=1024` : null;
+  
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -43,6 +46,12 @@ function renderPage(s) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta property="og:title" content="${esc(s.server_name)} – Spawn Board">
+  <meta property="og:description" content="${s.server_desc ? esc(s.server_desc).substring(0, 200) : 'A Discord server on Spawn Board'}">
+  <meta property="og:image" content="${icon}">
+  <meta property="og:url" content="https://spawnboard.pages.dev/server/${s.guild_id}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(s.server_name)} – Spawn Board</title>
@@ -67,15 +76,56 @@ function renderPage(s) {
     </label>
   </div>
 
-  <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
-    <img src="${icon}" onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
-    <div style="flex:1;min-width:260px;">
-      <h1>${esc(s.server_name)}</h1>
-      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
-      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
-      <p><strong>Updated:</strong> ${updated}</p>
-      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
-      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
+  <div class="container">
+    ${banner ? `
+      <div style="width:100%;height:200px;border-radius:12px;overflow:hidden;margin-bottom:1.5rem;background:#000;">
+        <img src="${banner}" 
+             alt="Server banner" 
+             style="width:100%;height:100%;object-fit:cover;"
+             onerror="this.style.display='none'; this.parentElement.style.background='#2c2c2c';">
+      </div>
+    ` : ''}
+
+    <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start;">
+      <img src="${icon}" 
+           alt="Server icon" 
+           style="width:128px;height:128px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+
+      <div style="flex:1;min-width:260px;">
+        <h1 style="margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:2rem;">
+          ${esc(s.server_name)}
+          ${s.verified ? '<span style="background:#5865F2;color:white;padding:3px 10px;border-radius:6px;font-size:13px;font-weight:600;">Verified</span>' : ''}
+          ${s.premium_tier ? `<span style="background:#F47B67;color:white;padding:3px 10px;border-radius:6px;font-size:13px;font-weight:600;">Boost Tier ${s.premium_tier}</span>` : ''}
+        </h1>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;font-size:15px;">
+          <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
+          <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
+          <p><strong>Updated:</strong> ${updated}</p>
+        </div>
+
+        ${s.server_desc ? `<p style="margin:20px 0;line-height:1.7;font-size:16px;color:#444;">${esc(s.server_desc)}</p>` : ''}
+
+        <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
+          <a href="https://discord.com/servers/${s.guild_id}" 
+             target="_blank" rel="noopener" 
+             style="background:#5865F2;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
+            Open in Discord
+          </a>
+
+          ${s.invite_code ? `
+            <button onclick="navigator.clipboard.writeText('https://discord.gg/${esc(s.invite_code)}')" 
+                    style="background:#43b581;color:white;padding:12px 24px;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;">
+              Copy Invite
+            </button>
+          ` : ''}
+
+          <button onclick="navigator.clipboard.writeText('${s.guild_id}')" 
+                  style="background:#666;color:white;padding:12px 24px;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;">
+            Copy ID
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
