@@ -34,7 +34,7 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`;
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -68,49 +68,19 @@ function renderPage(s) {
   </div>
 
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
-    <img src=${icon} onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
+    <img src="${icon}" onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
-      <main id="server-profile" class="content">
-  <div class="profile-container">
-    <div class="profile-header">
-      <h1 id="serverName" class="server-name">Loading...</h1>
-      <p id="serverDesc" class="server-desc">Loading description...</p>
-    </div>
-
-    <div class="profile-stats">
-      <div class="stat-box">
-        <h3>Members</h3>
-        <p id="memberCount" class="stat-value">—</p>
-      </div>
-      <div class="stat-box">
-        <h3>Online</h3>
-        <p id="onlineCount" class="stat-value">—</p>
-      </div>
-      <div class="stat-box">
-        <h3>Last Updated</h3>
-        <p id="lastUpdated" class="stat-value">—</p>
-      </div>
-    </div>
-
-    <div class="profile-actions">
-      <a id="inviteButton" class="invite-btn" href="#" target="_blank" rel="noopener noreferrer">
-        Join Server
-      </a>
-    </div>
-  </div>
-</main>
+      <h1>${esc(s.server_name)}</h1>
+      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
+      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
+      <p><strong>Updated:</strong> ${updated}</p>
+      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
+      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
     </div>
   </div>
 
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
-  <script>
-  document.getElementById('serverName').textContent = s.server_name || 'Unknown Server';
-  document.getElementById('serverDesc').textContent = s.server_desc || 'No description available.';
-  document.getElementById('memberCount').textContent = s.member_count || '0';
-  document.getElementById('onlineCount').textContent = s.online_count || '0';
-  document.getElementById('lastUpdated').textContent = new Date(data.last_updated).toLocaleString();
-  document.getElementById('inviteButton').href = 'https://discord.gg/' + data.invite_code;
-  </script>
+
   <script>
     // Dark mode
     const t = document.getElementById('dark-toggle');
