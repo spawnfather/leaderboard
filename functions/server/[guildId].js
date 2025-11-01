@@ -34,9 +34,7 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  const icon = s.icon_hash 
-  ? `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.png?size=256`
-  : 'https://cdn.discordapp.com/embed/avatars/0.png';
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.png?size=256`
 
   const banner = s.banner_hash 
   ? `https://cdn.discordapp.com/banners/${s.guild_id}/${s.banner_hash}.png?size=1024`
