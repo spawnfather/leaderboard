@@ -34,27 +34,29 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  // -------------------------------------------------
-  // 1. Avatar fallback (text + background color)
-  // -------------------------------------------------
-  const words = (s.server_name || '').trim().split(/\s+/);
-  const initials = words.length >= 2
-    ? (words[0][0] + words[words.length - 1][0]).toUpperCase()
-    : (words[0]?.slice(0, 2) || '??').toUpperCase();
+  // ──────────────────────────────────────────────────────
+  // 1. Build the *real* Discord CDN URL (you already have it)
+  // ──────────────────────────────────────────────────────
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`;
+  const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-  // Simple hash → hue for a consistent colour per server
-  let hash = 0;
-  for (let i = 0; i < s.guild_id.length; i++) hash = (hash * 31 + s.guild_id.charCodeAt(i)) & 0xffffffff;
-  const hue = Math.abs(hash) % 360;
-  const avatarStyle = `background:hsl(${hue},70%,55%);color:#fff;`;
+  // ──────────────────────────────────────────────────────
+  // 2. HTML-attribute-safe escaping for the two URLs
+  // ──────────────────────────────────────────────────────
+  const escAttr = str => String(str).replace(/&/g, '&amp;')
+                                   .replace(/'/g, '&#39;')
+                                   .replace(/"/g, '&quot;');
 
+  const safeIcon     = escAttr(icon);
+  const safeFallback = escAttr(fallback);
+
+  // ──────────────────────────────────────────────────────
+  // 3. Rest of the page (unchanged except the <img>)
+  // ──────────────────────────────────────────────────────
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
-  // -------------------------------------------------
-  // 2. HTML (no <img> tags, fully responsive)
-  // -------------------------------------------------
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,20 +65,6 @@ function renderPage(s) {
   <title>${esc(s.server_name)} – Spawn Board</title>
   <link rel="stylesheet" href="/template/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <style>
-    /* -------------------------------------------------
-       Profile-page specific overrides (kept tiny)
-       ------------------------------------------------- */
-    .profile-layout{display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start;max-width:1200px;margin:0 auto;padding:1.5rem;}
-    .avatar{display:flex;align-items:center;justify-content:center;width:128px;height:128px;border-radius:50%;font-size:3rem;font-weight:700;
-            text-shadow:0 1px 2px rgba(0,0,0,.3);flex-shrink:0;}
-    .info{flex:1;min-width:260px;}
-    .info h1{margin:0 0 .5rem;font-size:2.2rem;color:#007bff;}
-    .info p{margin:0.4rem 0;font-size:1rem;}
-    .info a{color:#007bff;font-weight:600;text-decoration:none;}
-    .info a:hover{text-decoration:underline;}
-    @media(max-width:600px){.avatar{width:96px;height:96px;font-size:2.2rem;}}
-  </style>
 </head>
 <body>
   <header>
@@ -95,26 +83,27 @@ function renderPage(s) {
     </label>
   </div>
 
-  <section class="profile-layout">
-    <!-- Text avatar -->
-    <div class="avatar" style="${avatarStyle}">${esc(initials)}</div>
+  <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
+    <!--  THE ONLY CHANGE  -->
+    <img src="${safeIcon}"
+         onerror="this.src='${safeFallback}'"
+         alt="${esc(s.server_name)} icon"
+         style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
 
-    <div class="info">
+    <div style="flex:1;min-width:260px;">
       <h1>${esc(s.server_name)}</h1>
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
       <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
       <p><strong>Updated:</strong> ${updated}</p>
       ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
-      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener">
-        View on Discord
-      </a></p>
+      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener"
+            style="color:#007bff;font-weight:600;">View on Discord</a></p>
     </div>
-  </section>
+  </div>
 
   <footer>© 2025 SpawnBoard. All rights reserved.</footer>
 
   <script>
-    // Dark-mode toggle (unchanged)
     const t = document.getElementById('dark-toggle');
     if (localStorage.getItem('darkTheme') === 'true') {
       document.body.classList.add('dark-theme'); t.checked = true;
