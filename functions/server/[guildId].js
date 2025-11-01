@@ -1,7 +1,7 @@
-const SUPABASE_URL = 'https://gzrsknywsqpfimeecydn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cnNrbnl3c3FwZmltZWVjeWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNzc3MDgsImV4cCI6MjA3NjY1MzcwOH0.hjBoZqa-BC41cnbknzwkM36mER2I-3gsk-hUp7CVaWA';
+export async function onRequestGet({ env }) {
+  const SUPABASE_URL = env.SUPABASE_URL;
+  const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY;
 
-export async function onRequestGet({ params }) {
   return new Response(`
 <!DOCTYPE html>
 <html lang="en">
@@ -26,15 +26,13 @@ export async function onRequestGet({ params }) {
     .btn { padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; background:#007bff; color:white; text-decoration:none; }
     .btn.secondary { background:transparent; color:#007bff; border:1px solid rgba(0,123,255,0.16); }
     .description { margin-top:14px; color:#333; line-height:1.5; }
-    body.dark-theme .stat { background: rgba(187, 222, 251, 0.06); color: #bbdefb; }
-    body.dark-theme .server-badge { background: linear-gradient(135deg, #6c63ff 0%, #00b4ff 100%); }
   </style>
 </head>
 <body>
   <div class="nav-container">
     <nav>
       <ul>
-        <li><a href="/">Leaderboard</a></li>
+        <li><a href="/">Home</a></li>
         <li><a href="/servers">Servers</a></li>
       </ul>
     </nav>
@@ -67,14 +65,19 @@ export async function onRequestGet({ params }) {
   </main>
 
   <script>
+    // Inject environment variables from Cloudflare Pages
+    window.SUPABASE_URL = "${SUPABASE_URL}";
+    window.SUPABASE_ANON_KEY = "${SUPABASE_ANON_KEY}";
+  </script>
+
+  <script>
     (async function () {
-      // Create Supabase client from environment variables
+      const SUPABASE_URL = window.SUPABASE_URL;
+      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
       const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // Extract guild ID from the URL
-      const guildId = params.guildId;
+      const guildId = window.location.pathname.split('/').pop();
 
-      // Fetch the server info
       const { data, error } = await supabase
         .from('leaderboardmain')
         .select('*')
@@ -83,7 +86,7 @@ export async function onRequestGet({ params }) {
 
       if (error || !data) {
         document.getElementById('serverName').textContent = 'Server not found';
-        document.getElementById('serverDesc').textContent = 'No server data available.';
+        document.getElementById('serverDesc').textContent = 'No data available.';
         console.error(error);
         return;
       }
@@ -91,14 +94,12 @@ export async function onRequestGet({ params }) {
       const server = data;
       const inviteUrl = 'https://discord.gg/' + (server.invite_code || guildId);
 
-      // Fill in content
       document.getElementById('serverName').textContent = server.server_name;
       document.getElementById('memberCount').textContent = 'Members: ' + (server.member_count ?? '—');
       document.getElementById('onlineCount').textContent = 'Online: ' + (server.online_count ?? '—');
       document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date(server.last_updated).toLocaleDateString();
       document.getElementById('serverDesc').textContent = server.server_desc || 'No description provided.';
 
-      // Server badge (icon or fallback)
       const badge = document.getElementById('serverBadge');
       if (server.icon_hash) {
         const img = document.createElement('img');
@@ -111,7 +112,6 @@ export async function onRequestGet({ params }) {
         badge.textContent = server.server_name[0].toUpperCase();
       }
 
-      // Buttons
       const joinBtn = document.getElementById('joinBtn');
       joinBtn.href = inviteUrl;
 
@@ -128,7 +128,5 @@ export async function onRequestGet({ params }) {
   </script>
 </body>
 </html>
-  `, {
-    headers: { 'Content-Type': 'text/html' },
-  })
+  `, { headers: { 'Content-Type': 'text/html' } })
 }
