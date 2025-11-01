@@ -70,17 +70,47 @@ function renderPage(s) {
   <div class="container" style="display:flex;gap:2rem;flex-wrap:wrap;">
     <img src=${icon} onerror="this.src='${fallback}'" alt="icon" style="width:128px;height:128px;border-radius:50%;object-fit:cover;">
     <div style="flex:1;min-width:260px;">
-      <h1>${esc(s.server_name)}</h1>
-      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
-      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
-      <p><strong>Updated:</strong> ${updated}</p>
-      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
-      <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
+      <main id="server-profile" class="content">
+  <div class="profile-container">
+    <div class="profile-header">
+      <h1 id="serverName" class="server-name">Loading...</h1>
+      <p id="serverDesc" class="server-desc">Loading description...</p>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-box">
+        <h3>Members</h3>
+        <p id="memberCount" class="stat-value">—</p>
+      </div>
+      <div class="stat-box">
+        <h3>Online</h3>
+        <p id="onlineCount" class="stat-value">—</p>
+      </div>
+      <div class="stat-box">
+        <h3>Last Updated</h3>
+        <p id="lastUpdated" class="stat-value">—</p>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a id="inviteButton" class="invite-btn" href="#" target="_blank" rel="noopener noreferrer">
+        Join Server
+      </a>
+    </div>
+  </div>
+</main>
     </div>
   </div>
 
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
-
+  <script>
+  document.getElementById('serverName').textContent = data.server_name || 'Unknown Server';
+  document.getElementById('serverDesc').textContent = data.server_desc || 'No description available.';
+  document.getElementById('memberCount').textContent = data.member_count || '0';
+  document.getElementById('onlineCount').textContent = data.online_count || '0';
+  document.getElementById('lastUpdated').textContent = new Date(data.last_updated).toLocaleString();
+  document.getElementById('inviteButton').href = 'https://discord.gg/' + data.invite_code;
+  </script>
   <script>
     // Dark mode
     const t = document.getElementById('dark-toggle');
