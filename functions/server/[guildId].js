@@ -107,10 +107,10 @@ function renderPage(s) {
         ${s.server_desc ? `<p style="margin:20px 0;line-height:1.7;font-size:16px;color:#444;">${esc(s.server_desc)}</p>` : ''}
 
         <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
-          <a href="https://discord.com/servers/${s.guild_id}" 
+          <a href="https://discord.com/invite/${s.invite_code}" 
              target="_blank" rel="noopener" 
              style="background:#5865F2;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">
-            Open in Discord
+            Join Server
           </a>
 
           ${s.invite_code ? `
