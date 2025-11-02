@@ -44,6 +44,23 @@ function renderPage(s) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(s.server_name)} – Spawn Board</title>
+
+  
+  <meta name="title" content="${esc(s.server_name)} @ SpawnBoard" />
+  <meta name="description" content="Join this server and many others on the Spawnism Leaderboard only located at SpawnBoard!" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://spawnboard.pages.dev/" />
+  <meta property="og:title" content="Spawn Board - Spawnism Leaderboard" />
+  <meta property="og:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
+  <meta property="og:description" content="Join this server and many others on the Spawnism Leaderboard only located at SpawnBoard!" />
+
+
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://spawnboard.pages.dev/" />
+  <meta property="twitter:title" content="${esc(s.server_name)} @ SpawnBoard" />
+  <meta property="twitter:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
+  <meta property="twitter:description" content="Join this server and many others on the Spawnism Leaderboard only located at SpawnBoard!" />
+
   <link rel="stylesheet" href="/template/styles.css">
   <!-- Load Supabase IIFE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
