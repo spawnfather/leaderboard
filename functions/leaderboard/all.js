@@ -12,7 +12,7 @@ export async function onRequest(context) {
   });
 
   if (!response.ok) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch data' }), {
+    return new Response(JSON.stringify({ error: 'Failed to fetch data' }, null, 2), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -20,7 +20,10 @@ export async function onRequest(context) {
 
   const data = await response.json();
 
-  return new Response(JSON.stringify(data), {
+  // Pretty-print the JSON with 2-space indentation
+  const prettyJson = JSON.stringify(data, null, 2);
+
+  return new Response(prettyJson, {
     headers: { 
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',  // Allow CORS for any developer
