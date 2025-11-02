@@ -3,7 +3,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export async function onRequest(context) {
   // Query Supabase
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=*&order=member_count.desc`, {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=*&order=member_count.desc,guild_id::text`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
