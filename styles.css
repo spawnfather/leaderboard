@@ -169,9 +169,9 @@
                 font-weight: bold;
                 text-align: left;
             }
-            td:nth-of-type(1):before { content: "Rank:"; }
-            td:nth-of-type(2):before { content: "Server Name:"; }
-            td:nth-of-type(3):before { content: "Member Count:"; }
+            td:nth-of-type(1):before { content: "Rank"; }
+            td:nth-of-type(2):before { content: "Server Name"; }
+            td:nth-of-type(3):before { content: "Member(s)"; }
             td:nth-of-type(4):before { content: ""; }
         }
 
