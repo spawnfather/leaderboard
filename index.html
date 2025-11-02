@@ -129,6 +129,10 @@
                     actionsTd.style.display = 'flex';
                     actionsTd.style.alignItems = 'center';
                     actionsTd.style.gap = '10px';
+                    actionsTd.style.justifyContent = 'center'; // Center the buttons horizontally within the cell
+                    actionsTd.style.padding = '8px 0'; // Optional: Add vertical padding for better click area
+                    actionsTd.style.flexWrap = 'nowrap'; // Prevent wrapping to next line
+                    actionsTd.style.overflow = 'hidden';
 
                     const pageBtn = document.createElement('a');
                     pageBtn.href = `https://spawnboard.pages.dev/server/${item.guild_id}`; // Replace with the relative or absolute URL to the other page on your website
