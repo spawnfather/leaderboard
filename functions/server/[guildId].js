@@ -38,9 +38,20 @@ function renderPage(s) {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
-  const iconUrl = s.icon_hash
-  ? `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=128`
-  : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  // Generate icon URL (fallback to default Discord placeholder)
+  const iconUrl = s.icon_hash 
+    ? `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`
+    : `https://cdn.discordapp.com/embed/avatars/0.png`;
+
+  // Generate banner URL (only if banner_hash exists)
+  const bannerUrl = s.banner_hash 
+    ? `https://cdn.discordapp.com/banners/${s.guild_id}/${s.banner_hash}.webp?size=1024`
+    : null;
+
+  // Fallback banner if none (soft gradient – works in light/dark mode)
+  const fallbackBannerStyle = bannerUrl ? '' : `
+    background: linear-gradient(135deg, #5865F2 0%, #00C09A 100%);
+  `;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -68,6 +79,62 @@ function renderPage(s) {
   <link rel="stylesheet" href="/template/styles.css">
   <!-- Load Supabase IIFE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <style>
+    /* Hero header with banner + centered icon */
+    .hero-header {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      ${fallbackBannerStyle}
+    }
+    ${bannerUrl ? `.hero-header { background-image: url('${bannerUrl}'); }` : ''}
+    
+    .hero-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35); /* Subtle overlay for text readability */
+      backdrop-filter: blur(2px);
+    }
+    
+    .icon-wrapper {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%) translateY(50%);
+      z-index: 2;
+    }
+    
+    .server-icon {
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 6px solid var(--bg-color, #ffffff);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+    }
+    
+    .server-icon:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Dark mode adjustments */
+    .dark-theme .hero-header::before {
+      background: rgba(0,0,0,0.5);
+    }
+    
+    @media (max-width: 480px) {
+      .hero-header { height: 180px; }
+      .server-icon { width: 120px; height: 120px; }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -87,22 +154,28 @@ function renderPage(s) {
   </div>
 
   <div class="container">
-      <div style="text-align:center; margin-bottom:1.5rem;">
-          <img src="${iconUrl}" alt="${esc(s.server_name)} icon"
-              style="width:128px; height:128px; border-radius:50%; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
-              onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+      <!-- Banner + Icon Hero -->
+      <div class="hero-header">
+        <div class="icon-wrapper">
+          <img src="${iconUrl}" alt="${esc(s.server_name)} icon" class="server-icon"
+               onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+        </div>
       </div>
-      <h1>${esc(s.server_name)}</h1>
-      <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
-      <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
-      <p><strong>Updated:</strong> ${updated}</p>
-      ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word;">${esc(s.server_desc)}</p>` : ''}
-      <p><a href="/privacy" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">Learn More...</a></p>
-      <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
-        <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy ID</button>
-        <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite</button>
+      
+      <!-- Server Details (shifted down to account for overlapping icon) -->
+      <div style="margin-top: 80px;"> <!-- Clears the overhanging icon -->
+        <h1 style="text-align:center; margin-bottom:1rem;">${esc(s.server_name)}</h1>
+        <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
+        <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
+        <p><strong>Updated:</strong> ${updated}</p>
+        ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word;">${esc(s.server_desc)}</p>` : ''}
+        <p><a href="/privacy" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">Learn More...</a></p>
+        <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+          <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy ID</button>
+          <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite</button>
+        </div>
+        <button style="width:100%; margin-top:1rem; padding:8px 16px;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
       </div>
-      <button style="width:100%; margin-top:1rem; padding:8px 16px;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
   </div>
 
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
