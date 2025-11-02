@@ -6,7 +6,7 @@ export async function onRequest({ params }) {
 
   // Try to get from Supabase
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?guild_id=eq.${guildId}&select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?guild_id=eq.${guildId}&select=*,guild_id::text`, {
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
@@ -37,6 +37,10 @@ function renderPage(s) {
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
+
+  const iconUrl = s.icon_hash
+  ? `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=128`
+  : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -83,6 +87,11 @@ function renderPage(s) {
   </div>
 
   <div class="container">
+      <div style="text-align:center; margin-bottom:1.5rem;">
+          <img src="${iconUrl}" alt="${esc(s.server_name)} icon"
+              style="width:128px; height:128px; border-radius:50%; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
+              onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+      </div>
       <h1>${esc(s.server_name)}</h1>
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
       <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
