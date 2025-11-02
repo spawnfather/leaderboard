@@ -50,7 +50,7 @@ function renderPage(s) {
   <meta name="description" content="Join this server and many others on the Spawnism Leaderboard only located at SpawnBoard!" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://spawnboard.pages.dev/" />
-  <meta property="og:title" content="Spawn Board - Spawnism Leaderboard" />
+  <meta property="og:title" content="${esc(s.server_name)} @ SpawnBoard" />
   <meta property="og:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
   <meta property="og:description" content="Join this server and many others on the Spawnism Leaderboard only located at SpawnBoard!" />
 
