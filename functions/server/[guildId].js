@@ -70,7 +70,7 @@ function renderPage(s) {
       <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
       <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
       <p><strong>Updated:</strong> ${updated}</p>
-      ${s.server_desc ? `<p>${esc(s.server_desc)}</p>` : ''}
+      ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word;">${esc(s.server_desc)}</p>` : ''}
       <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
       <div style="display:flex;gap:1rem;margin-top:1rem;">
         <button onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
