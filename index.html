@@ -125,7 +125,7 @@
                     row.appendChild(countTd);
 
                     // ---------- NEW "Join Server" BUTTON ----------
-                    const inviteTd = document.createElement('td');
+                    const actionsTd = document.createElement('td');
 
                     // Guard against missing/empty invite codes
                     const inviteCode = (item.invite_code || '').trim();
@@ -136,11 +136,22 @@
                         joinBtn.rel = 'noopener noreferrer';
                         joinBtn.className = 'join-btn';
                         joinBtn.textContent = 'Join Server';
-                        inviteTd.appendChild(joinBtn);
-                     } else {
-                        inviteTd.textContent = '—';
+                        actionsTd.appendChild(joinBtn);
+                     }           
+                        
+                    const pageBtn = document.createElement('a');
+                    pageBtn.href = `https://spawnboard.pages.dev/server/${item.guild_id}`; // Replace with the relative or absolute URL to the other page on your website
+                    pageBtn.target = '_blank'; // Opens in new tab; remove or set to '_self' if you want same tab
+                    pageBtn.rel = 'noopener noreferrer';
+                    pageBtn.className = 'join-btn'; // Reuse class for consistent styling; adjust if needed
+                    pageBtn.textContent = 'More Details'; // Replace with your desired button text
+                    actionsTd.appendChild(pageBtn); // Appends next to Join Server if present (add CSS like 'margin-left: 10px;' for spacing if needed)
+
+                    if (actionsTd.childNodes.length === 0) {
+                        actionsTd.textContent = '—';
                     }
-                    row.appendChild(inviteTd);
+
+                    row.appendChild(actionsTs);
                     tbody.appendChild(row);
                 });
 
