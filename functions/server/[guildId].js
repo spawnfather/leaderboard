@@ -73,10 +73,10 @@ function renderPage(s) {
       ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word;">${esc(s.server_desc)}</p>` : ''}
       <p><a href="https://discord.com/servers/${s.guild_id}" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">View on Discord</a></p>
       <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
-        <button style="flex:1;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
-        <button style="flex:1;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy Server ID</button>
-        <button style="flex:1;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite Code</button>
+        <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy Server ID</button>
+        <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite Code</button>
       </div>
+      <button style="width:100%; margin-top:1rem; padding:8px 16px;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
   </div>
 
   <footer>&copy; 2025 SpawnBoard. All rights reserved.</footer>
