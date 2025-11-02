@@ -34,7 +34,7 @@ export async function onRequest({ params }) {
 // HTML with inline Supabase client (IIFE) + fetch
 // ──────────────────────────────────────────────────────────────
 function renderPage(s) {
-  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.guild_id}.webp?size=256`;
+  const icon = `https://cdn.discordapp.com/icons/${s.guild_id}/${s.icon_hash}.webp?size=256`;
   const fallback = 'https://cdn.discordapp.com/embed/avatars/0.png';
   const updated = new Date(s.last_updated).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
