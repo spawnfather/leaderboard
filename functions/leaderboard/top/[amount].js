@@ -16,7 +16,7 @@ export async function onRequest(context) {
     });
   }
 
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=*&order=member_count.desc&limit=${limit}`, {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=*&order=member_count.desc&limit=${limit}, guild_id::text`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
