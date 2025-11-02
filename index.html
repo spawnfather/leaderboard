@@ -124,7 +124,7 @@
                     countTd.textContent = item.member_count ?? '—';
                     row.appendChild(countTd);
 
-                    // ---------- NEW "Join Server" BUTTON ----------
+                    // ---------- ACTIONS TD (formerly inviteTd) ----------
                     const actionsTd = document.createElement('td');
 
                     // Guard against missing/empty invite codes
@@ -137,21 +137,23 @@
                         joinBtn.className = 'join-btn';
                         joinBtn.textContent = 'Join Server';
                         actionsTd.appendChild(joinBtn);
-                     }           
-                        
+                    }
+
+                    // ---------- NEW BUTTON NEXT TO JOIN (or alone if no join) ----------
                     const pageBtn = document.createElement('a');
-                    pageBtn.href = `https://spawnboard.pages.dev/server/${item.guild_id}`; // Replace with the relative or absolute URL to the other page on your website
+                    pageBtn.href = '/your-page-path'; // Replace with the relative or absolute URL to the other page on your website
                     pageBtn.target = '_blank'; // Opens in new tab; remove or set to '_self' if you want same tab
                     pageBtn.rel = 'noopener noreferrer';
                     pageBtn.className = 'join-btn'; // Reuse class for consistent styling; adjust if needed
-                    pageBtn.textContent = 'More Details'; // Replace with your desired button text
+                    pageBtn.textContent = 'Open Page'; // Replace with your desired button text
                     actionsTd.appendChild(pageBtn); // Appends next to Join Server if present (add CSS like 'margin-left: 10px;' for spacing if needed)
 
+                    // Fallback if no buttons at all
                     if (actionsTd.childNodes.length === 0) {
                         actionsTd.textContent = '—';
                     }
 
-                    row.appendChild(actionsTs);
+                    row.appendChild(actionsTd);
                     tbody.appendChild(row);
                 });
 
