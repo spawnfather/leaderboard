@@ -84,13 +84,13 @@ function renderPage(s) {
     .hero-header {
       position: relative;
       width: 100%;
-      height: 240px;
+      height: 200px;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 2rem;
+      overflow: visible;
+      margin-bottom: 1rem;
       ${fallbackBannerStyle}
     }
     ${bannerUrl ? `.hero-header { background-image: url('${bannerUrl}'); }` : ''}
@@ -101,6 +101,7 @@ function renderPage(s) {
       inset: 0;
       background: rgba(0,0,0,0.35); /* Subtle overlay for text readability */
       backdrop-filter: blur(2px);
+      border-radius: 12px;
     }
     
     .icon-wrapper {
@@ -130,9 +131,15 @@ function renderPage(s) {
       background: rgba(0,0,0,0.5);
     }
     
+    .server-details {
+      text-align: center;
+      padding-top: 80px; /* Clears the overhanging icon */
+    }
+    
     @media (max-width: 480px) {
-      .hero-header { height: 180px; }
+      .hero-header { height: 160px; }
       .server-icon { width: 120px; height: 120px; }
+      .server-details { padding-top: 70px; }
     }
   </style>
 </head>
@@ -162,19 +169,19 @@ function renderPage(s) {
         </div>
       </div>
       
-      <!-- Server Details (shifted down to account for overlapping icon) -->
-      <div style="margin-top: 80px;"> <!-- Clears the overhanging icon -->
-        <h1 style="text-align:center; margin-bottom:1rem;">${esc(s.server_name)}</h1>
+      <!-- Server Details -->
+      <div class="server-details">
+        <h1 style="margin-bottom:1rem;">${esc(s.server_name)}</h1>
         <p><strong>Members:</strong> ${s.member_count.toLocaleString()}</p>
         <p><strong>Online:</strong> ${s.online_count.toLocaleString()}</p>
         <p><strong>Updated:</strong> ${updated}</p>
-        ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word;">${esc(s.server_desc)}</p>` : ''}
+        ${s.server_desc ? `<p style="overflow-wrap: break-word; word-wrap: break-word; max-width: 600px; margin: 1rem auto;">${esc(s.server_desc)}</p>` : ''}
         <p><a href="/privacy" target="_blank" rel="noopener" style="color:#007bff;font-weight:600;">Learn More...</a></p>
-        <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
-          <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy ID</button>
-          <button style="flex:1; min-width:120px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite</button>
+        <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap; justify-content: center;">
+          <button style="flex:1; min-width:120px; max-width: 200px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.guild_id)}')">Copy ID</button>
+          <button style="flex:1; min-width:120px; max-width: 200px; padding:8px 16px;" onclick="copyToClipboard('${esc(s.invite_code)}')">Copy Invite</button>
         </div>
-        <button style="width:100%; margin-top:1rem; padding:8px 16px;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
+        <button style="width:100%; max-width: 400px; margin:1.5rem auto 0; padding:8px 16px; display: block;" onclick="window.open('https://discord.gg/${esc(s.invite_code)}', '_blank')">Join Server</button>
       </div>
   </div>
 
