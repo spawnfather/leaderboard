@@ -98,7 +98,7 @@
             try {
                 let { data, error } = await supabase
                     .from('leaderboardmain')
-                    .select('server_name, member_count, invite_code, last_updated')
+                    .select('guild_id, server_name, member_count, invite_code, last_updated')
                     .order('member_count', { ascending: false });
 
                 if (error) throw error;
