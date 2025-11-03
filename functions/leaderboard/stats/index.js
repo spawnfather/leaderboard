@@ -9,8 +9,8 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404 });
   }
 
-  // Fetch total_servers (count) - Corrected to select=count and added Prefer header for exact count
-  const countResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=count`, {
+  // Fetch total_servers (count)
+  const countResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=count(*)`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
@@ -27,8 +27,8 @@ export async function onRequest(context) {
   const countData = await countResponse.json();
   const total_servers = countData[0].count;
 
-  // Fetch total_members (sum) - Corrected to select=member_count.sum()
-  const sumResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=member_count.sum()`, {
+  // Fetch total_members (sum)
+  const sumResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=sum(member_count)`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
