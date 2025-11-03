@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpawnBoard API Documentation</title>
+
+    <!-- Updated meta tags for this API documentation page -->
+    <meta name="title" content="SpawnBoard API Documentation" />
+    <meta name="description" content="Documentation for the SpawnBoard API endpoints, including leaderboard data retrieval." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://spawnboard.pages.dev/api" />
+    <meta property="og:title" content="SpawnBoard API Documentation" />
+    <meta property="og:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
+    <meta property="og:description" content="Learn how to use the SpawnBoard API to fetch leaderboard data in JSON format." />
+    
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://spawnboard.pages.dev/api" />
+    <meta property="twitter:title" content="SpawnBoard API Documentation" />
+    <meta property="twitter:image" content="https://i.ibb.co/qMZM2P5P/SPAWN-BOARD.png" />
+    <meta property="twitter:description" content="Learn how to use the SpawnBoard API to fetch leaderboard data in JSON format." />
+    
+    <!-- Link to the global stylesheet -->
+    <link rel="stylesheet" href="/template/styles.css">
+    
+    <!-- Additional styles for code blocks and copy buttons -->
+    <style>
+        .code-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        pre {
+            background-color: #f4f4f4;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: auto;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        code {
+            color: #333;
+        }
+        
+        /* Basic syntax highlighting for Python (manual classes for keywords, strings, etc.) */
+        .keyword { color: #007bff; }
+        .string { color: #28a745; }
+        .comment { color: #6c757d; font-style: italic; }
+        .function { color: #fd7e14; }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Dark theme adjustments */
+        .dark-theme pre {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+        }
+        
+        .dark-theme code {
+            color: #e0e0e0;
+        }
+        
+        .dark-theme .keyword { color: #bbdefb; }
+        .dark-theme .string { color: #c3e88d; }
+        .dark-theme .comment { color: #888; }
+        .dark-theme .function { color: #ffcc80; }
+        
+        .dark-theme .copy-button {
+            background-color: #0056b3;
+        }
+        
+        .dark-theme .copy-button:hover {
+            background-color: #003d82;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header and Navigation Bar -->
+    <header>
+        <div class="nav-container">
+            <nav>
+                <ul>
+                    <li><a href="/leaderboard">Leaderboard</a></li>
+                    <li><a href="/submit">Submit Server</a></li>
+                    <!-- Added link to API docs for convenience; remove if not needed -->
+                    <li><a href="/api">API Docs</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Dark Theme Toggle -->
+    <div class="toggle-container">
+        <label for="dark-toggle">Dark Theme</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="dark-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <h1>SpawnBoard API Documentation</h1>
+        <p>This page documents the available API endpoints for retrieving leaderboard data from SpawnBoard. All responses are in JSON format.</p>
+        
+        <section>
+            <h2>Endpoint: /leaderboard/all</h2>
+            <p>Returns the entirety of the leaderboard as JSON. This endpoint provides a complete list of all servers in the leaderboard.</p>
+            
+            <h3>Examples</h3>
+            
+            <!-- Example 1 Placeholder -->
+            <h4>Example 1: Basic Fetch</h4>
+            <div class="code-container">
+                <pre><code><span class="keyword">import</span> requests
+
+<span class="comment"># Replace with your API base URL</span>
+url = <span class="string">"https://api.spawnboard.com/leaderboard/all"</span>
+
+response = requests.<span class="function">get</span>(url)
+<span class="keyword">if</span> response.status_code == 200:
+    data = response.<span class="function">json</span>()
+    <span class="function">print</span>(data)  <span class="comment"># Output the full leaderboard JSON</span>
+<span class="keyword">else</span>:
+    <span class="function">print</span>(<span class="string">"Error:"</span>, response.status_code)</code></pre>
+                <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+            </div>
+            <p>[Placeholder: Describe what this example does or add actual response snippet here.]</p>
+            
+            <!-- Example 2 Placeholder -->
+            <h4>Example 2: With Error Handling</h4>
+            <div class="code-container">
+                <pre><code><span class="keyword">import</span> requests
+<span class="keyword">from</span> requests.exceptions <span class="keyword">import</span> RequestException
+
+<span class="keyword">try</span>:
+    url = <span class="string">"https://api.spawnboard.com/leaderboard/all"</span>
+    response = requests.<span class="function">get</span>(url, timeout=10)
+    response.<span class="function">raise_for_status</span>()
+    data = response.<span class="function">json</span>()
+    <span class="function">print</span>(<span class="string">"Leaderboard:"</span>, data)
+<span class="keyword">except</span> RequestException <span class="keyword">as</span> e:
+    <span class="function">print</span>(<span class="string">"Failed to fetch leaderboard:"</span>, <span class="function">str</span>(e))</code></pre>
+                <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+            </div>
+            <p>[Placeholder: Describe what this example does or add actual response snippet here.]</p>
+        </section>
+        
+        <section>
+            <h2>Endpoint: /leaderboard/top/{amount}</h2>
+            <p>Returns the top {amount} servers from the leaderboard as JSON. Replace {amount} with the number of top servers you want to retrieve (e.g., /leaderboard/top/10).</p>
+            
+            <h3>Examples</h3>
+            
+            <!-- Example 1 Placeholder -->
+            <h4>Example 1: Fetch Top 5</h4>
+            <div class="code-container">
+                <pre><code><span class="keyword">import</span> requests
+
+amount = 5
+url = <span class="function">f</span><span class="string">"https://api.spawnboard.com/leaderboard/top/{amount}"</span>
+
+response = requests.<span class="function">get</span>(url)
+<span class="keyword">if</span> response.ok:
+    top_servers = response.<span class="function">json</span>()
+    <span class="function">print</span>(top_servers)
+<span class="keyword">else</span>:
+    <span class="function">print</span>(<span class="string">"Error fetching top servers"</span>)</code></pre>
+                <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+            </div>
+            <p>[Placeholder: Describe what this example does or add actual response snippet here.]</p>
+            
+            <!-- Example 2 Placeholder -->
+            <h4>Example 2: Dynamic Amount with Validation</h4>
+            <div class="code-container">
+                <pre><code><span class="keyword">import</span> requests
+
+<span class="keyword">def</span> <span class="function">get_top_servers</span>(amount):
+    <span class="keyword">if</span> <span class="keyword">not</span> <span class="function">isinstance</span>(amount, <span class="keyword">int</span>) <span class="keyword">or</span> amount &lt; 1:
+        <span class="keyword">raise</span> ValueError(<span class="string">"Amount must be a positive integer"</span>)
+    url = <span class="function">f</span><span class="string">"https://api.spawnboard.com/leaderboard/top/{amount}"</span>
+    response = requests.<span class="function">get</span>(url)
+    <span class="keyword">return</span> response.<span class="function">json</span>() <span class="keyword">if</span> response.status_code == 200 <span class="keyword">else</span> <span class="keyword">None</span>
+
+<span class="comment"># Usage</span>
+print(<span class="function">get_top_servers</span>(10))</code></pre>
+                <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
+            </div>
+            <p>[Placeholder: Describe what this example does or add actual response snippet here.]</p>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 SpawnBoard. All rights reserved.
+    </footer>
+
+    <!-- JavaScript for Dark Theme Toggle (unchanged) -->
+    <script>
+        const darkToggle = document.getElementById('dark-toggle');
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            darkToggle.checked = true;
+        }
+        darkToggle.addEventListener('change', () => {
+            if (darkToggle.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
+    
+    <!-- JavaScript for Copy Code Buttons -->
+    <script>
+        function copyCode(button) {
+            const code = button.previousElementSibling.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                button.innerText = 'Copied!';
+                setTimeout(() => { button.innerText = 'Copy Code'; }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
