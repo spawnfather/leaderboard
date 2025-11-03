@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpawnBoard API Documentation</title>
+    <title>SpawnBoard API</title>
 
     <!-- Updated meta tags for this API documentation page -->
     <meta name="title" content="SpawnBoard API Documentation" />
@@ -133,13 +133,13 @@
             <div class="code-container">
                 <pre><code><span class="keyword">import</span> requests
 
-url = <span class="string">"https://api.spawnboard.com/leaderboard/all"</span>
+url = <span class="string">"https://spawnboard.pages.dev/leaderboard/all"</span>
 
 response = requests.<span class="function">get</span>(url)
 <span class="keyword">if</span> response.status_code == 200:
     servers = response.<span class="function">json</span>()
     <span class="keyword">for</span> server <span class="keyword">in</span> servers:
-        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {server['name']}, Members: {server['members']}"</span>)
+        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {server['server_name']}, Members: {server['member_count']}"</span>)
 <span class="keyword">else</span>:
     <span class="function">print</span>(<span class="string">"Error:"</span>, response.status_code)</code></pre>
                 <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
@@ -151,15 +151,15 @@ response = requests.<span class="function">get</span>(url)
             <div class="code-container">
                 <pre><code><span class="keyword">import</span> requests
 
-url = <span class="string">"https://api.spawnboard.com/leaderboard/all"</span>
-guild_id = <span class="string">"1234567890"</span>  <span class="comment"># Replace with the desired guild ID</span>
+url = <span class="string">"https://spawnboard.pages.dev/leaderboard/all"</span>
+guild_id = <span class="string">"1395961465672040459"</span>  <span class="comment"># Replace with the desired guild ID</span>
 
 response = requests.<span class="function">get</span>(url)
 <span class="keyword">if</span> response.status_code == 200:
     servers = response.<span class="function">json</span>()
-    specific_server = <span class="keyword">next</span>((server <span class="keyword">for</span> server <span class="keyword">in</span> servers <span class="keyword">if</span> server[<span class="string">'id'</span>] == guild_id), <span class="keyword">None</span>)
+    specific_server = <span class="keyword">next</span>((server <span class="keyword">for</span> server <span class="keyword">in</span> servers <span class="keyword">if</span> server[<span class="string">'guild_id'</span>] == guild_id), <span class="keyword">None</span>)
     <span class="keyword">if</span> specific_server:
-        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {specific_server['name']}, Members: {specific_server['members']}"</span>)
+        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {specific_server['server_name']}, Members: {specific_server['member_count']}"</span>)
     <span class="keyword">else</span>:
         <span class="function">print</span>(<span class="string">"Guild not found"</span>)
 <span class="keyword">else</span>:
@@ -181,13 +181,13 @@ response = requests.<span class="function">get</span>(url)
                 <pre><code><span class="keyword">import</span> requests
 
 amount = 10
-url = <span class="function">f</span><span class="string">"https://api.spawnboard.com/leaderboard/top/{amount}"</span>
+url = <span class="function">f</span><span class="string">"https://spawnboard.pages.dev/leaderboard/top/{amount}"</span>
 
 response = requests.<span class="function">get</span>(url)
 <span class="keyword">if</span> response.status_code == 200:
     servers = response.<span class="function">json</span>()
     <span class="keyword">for</span> server <span class="keyword">in</span> servers:
-        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {server['name']}, Members: {server['members']}"</span>)
+        <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {server['server_name']}, Members: {server['member_count']}"</span>)
 <span class="keyword">else</span>:
     <span class="function">print</span>(<span class="string">"Error:"</span>, response.status_code)</code></pre>
                 <button class="copy-button" onclick="copyCode(this)">Copy Code</button>
@@ -200,13 +200,13 @@ response = requests.<span class="function">get</span>(url)
                 <pre><code><span class="keyword">import</span> requests
 
 amount = 10
-url = <span class="function">f</span><span class="string">"https://api.spawnboard.com/leaderboard/top/{amount}"</span>
-guild_id = <span class="string">"1234567890"</span>  <span class="comment"># Replace with the desired guild ID</span>
+url = <span class="function">f</span><span class="string">"https://spawnboard.pages.dev/leaderboard/top/{amount}"</span>
+guild_id = <span class="string">"1395961465672040459"</span>  <span class="comment"># Replace with the desired guild ID</span>
 
 response = requests.<span class="function">get</span>(url)
 <span class="keyword">if</span> response.status_code == 200:
     servers = response.<span class="function">json</span>()
-    specific_server = <span class="keyword">next</span>((server <span class="keyword">for</span> server <span class="keyword">in</span> servers <span class="keyword">if</span> server[<span class="string">'id'</span>] == guild_id), <span class="keyword">None</span>)
+    specific_server = <span class="keyword">next</span>((server <span class="keyword">for</span> server <span class="keyword">in</span> servers <span class="keyword">if</span> server[<span class="string">'guild_id'</span>] == guild_id), <span class="keyword">None</span>)
     <span class="keyword">if</span> specific_server:
         <span class="function">print</span>(<span class="function">f</span><span class="string">"Server: {specific_server['name']}, Members: {specific_server['members']}"</span>)
     <span class="keyword">else</span>:
