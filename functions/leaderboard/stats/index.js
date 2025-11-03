@@ -9,23 +9,25 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404 });
   }
 
-  // Fetch total_servers (count) - Corrected syntax: select=count()
-  const countResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=count()`, {
+  // Fetch total_servers (count) - Corrected to select=count and added Prefer header for exact count
+  const countResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=count`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
       'Content-Type': 'application/json',
+      'Prefer': 'count=exact',
     },
   });
 
   if (!countResponse.ok) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch total servers' }), { status: 500 });
+    const errorBody = await countResponse.text();
+    return new Response(JSON.stringify({ error: 'Failed to fetch total servers', details: errorBody }), { status: 500 });
   }
 
   const countData = await countResponse.json();
   const total_servers = countData[0].count;
 
-  // Fetch total_members (sum) - Corrected syntax: select=member_count.sum()
+  // Fetch total_members (sum) - Corrected to select=member_count.sum()
   const sumResponse = await fetch(`${SUPABASE_URL}/rest/v1/leaderboardmain?select=member_count.sum()`, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
@@ -35,7 +37,8 @@ export async function onRequest(context) {
   });
 
   if (!sumResponse.ok) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch total members' }), { status: 500 });
+    const errorBody = await sumResponse.text();
+    return new Response(JSON.stringify({ error: 'Failed to fetch total members', details: errorBody }), { status: 500 });
   }
 
   const sumData = await sumResponse.json();
@@ -51,7 +54,8 @@ export async function onRequest(context) {
   });
 
   if (!largestResponse.ok) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch largest server' }), { status: 500 });
+    const errorBody = await largestResponse.text();
+    return new Response(JSON.stringify({ error: 'Failed to fetch largest server', details: errorBody }), { status: 500 });
   }
 
   const largestData = await largestResponse.json();
@@ -71,7 +75,8 @@ export async function onRequest(context) {
   });
 
   if (!smallestResponse.ok) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch smallest server' }), { status: 500 });
+    const errorBody = await smallestResponse.text();
+    return new Response(JSON.stringify({ error: 'Failed to fetch smallest server', details: errorBody }), { status: 500 });
   }
 
   const smallestData = await smallestResponse.json();
