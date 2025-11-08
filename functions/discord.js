@@ -68,7 +68,7 @@ export const onRequestPost = async ({ request, env }) => {
     // Fetch invite info
     let inviteData;
     try {
-      const res = await fetch(`https://discord.com/api/v10/invites/${inviteCode}`, {
+      const res = await fetch(`https://discord.com/api/v10/invites/${inviteCode}?with_counts=true`, {
         headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}` },
       });
       inviteData = await res.json();
