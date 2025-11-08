@@ -108,7 +108,7 @@ export const onRequestPost = async ({ request, env }) => {
       fields: [
         { name: 'Server', value: `**${serverName}**`, inline: true },
         { name: 'Members', value: `${memberCount}`, inline: true },
-        { name: 'Link', value: `[Join Server](https://discord.gg/${inviteCode})`, inline: false },
+        { name: 'Link', value: `https://discord.gg/${inviteCode}`, inline: false },
         { name: 'Expires', value: expiresAt ? new Date(expiresAt).toLocaleString() : 'Never', inline: true },
         { name: 'Description', value: description, inline: false },
         { name: 'Submitted By', value: `<@${interaction.member.user.id}>`, inline: false },
