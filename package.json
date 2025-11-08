@@ -1,8 +1,5 @@
 {
   "name": "spawnboard-bot",
   "version": "1.0.0",
-  "main": "discord.js",
-  "dependencies": {
-    "discord-interactions": "^4.0.0"
-  }
+  "dependencies": {}
 }
