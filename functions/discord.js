@@ -104,7 +104,10 @@ export const onRequestPost = async ({ request, env }) => {
 
     const embed = {
       title: 'New Server Submission',
-      color: 0x00ff00,
+      color: 0x209af5,
+      thumbnail: {
+        url: 'https://i.ibb.co/vvMrJXY8/Your-paragraph-text-removebg-preview.png'
+      },
       fields: [
         { name: 'Server', value: `**${serverName}**`, inline: true },
         { name: 'Members', value: `${memberCount}`, inline: true },
