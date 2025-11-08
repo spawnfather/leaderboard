@@ -1,0 +1,4 @@
+# functions.toml — Only run bot on /api/bot
+[[functions]]
+  path = "/discord/bot"
+  script = "discord/bot.js"
