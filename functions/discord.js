@@ -131,7 +131,7 @@ export const onRequestPost = async ({ request, env }) => {
     // /leaderboard — FIXED & WORKING
     if (name === 'leaderboard') {
       try {
-        const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/7');
+        const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/5');
         const servers = res.ok ? await res.json() : [];
 
         if (!Array.isArray(servers) || servers.length === 0) {
@@ -148,8 +148,8 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `**${i + 1}.** ${s.server_name}\n> ${s.member_count.toLocaleString()} Members`)
-          .join('\n\n');
+          .map((s, i) => `**${i + 1}.** ${s.server_name} - ${s.member_count.toLocaleString()} Members`)
+          .join('\n');
 
         const embed = {
           title: 'Top Spawnism Servers',
