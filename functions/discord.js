@@ -149,7 +149,7 @@ export const onRequestPost = async ({ request, env }) => {
 
         const desc = servers
           .map((s, i) => `:medal: **${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members`)
-          .join('\n');
+          .join('');
 
         const embed = {
           title: 'Top Spawnism Servers',
