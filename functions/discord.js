@@ -148,8 +148,11 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `:medal: **${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members\n`)
-          .join('');
+          .map((s, i) => {
+            const medal = i === 0 ? ':first_place:' : i === 1 ? ':second_place:' : i === 2 ? ':third_place:' : ':medal:';
+            return `${medal} **${i + 1}.** ${s.server_name}\n> ${s.member_count.toLocaleString()} Members`;
+          })
+          .join('\n\n');
 
         const embed = {
           title: 'Top Spawnism Servers',
