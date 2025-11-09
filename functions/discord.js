@@ -130,69 +130,84 @@ export const onRequestPost = async ({ request, env }) => {
 
     // /leaderboard
     if (name === 'leaderboard') {
-      let servers = [];
-      try {
-        const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/7');
-        if (res.ok) servers = await res.json();
-      } catch (e) {
-        return Response.json({
-          type: 4,
-          data: { content: 'Failed to load leaderboard. Try again later.' },
-        });
-      }
+      // Immediate defer to avoid 3s timeout
+      const ack = Response.json({ type: 5 });
 
-      if (servers.length === 0) {
-        return Response.json({
-          type: 4,
-          data: { content: 'No servers on the leaderboard yet!' },
-        });
-      }
-
-      const medal = (i) => {
-        switch (i) {
-          case 0: return ':first_place:';
-          case 1: return ':second_place:';
-          case 2: return ':third_place:';
-          default: return `:medal:`;
+      // Background: fetch and edit
+      (async () => {
+        let servers = [];
+        try {
+          const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/7');
+          if (res.ok) servers = await res.json();
+        } catch (e) {
+          await editInteraction(interaction, env, 'Failed to load leaderboard. Try again later.');
+          return;
         }
-      };
 
-      const description = servers
-        .map((s, i) => `${medal(i)} **${s.name}** >> ${s.members.toLocaleString()} members`)
-        .join('\n\n');
+        if (servers.length === 0) {
+          await editInteraction(interaction, env, 'No servers on the leaderboard yet!');
+          return;
+        }
 
-      const embed = {
-        title: 'Top Spawnism Servers',
-        description,
-        color: 0x209af5,
-        footer: { text: 'Want to see more?' },
-        timestamp: new Date().toISOString(),
-      };
+        const medal = (i) => {
+          switch (i) {
+            case 0: return ':first_place:';
+            case 1: return ':second_place:';
+            case 2: return ':third_place:';
+            default: return ':medal:';
+          }
+        };
 
-      return Response.json({
-        type: 4,
-        data: {
-          embeds: [embed],
-          components: [
-            {
-              type: 1,
-              components: [
-                {
-                  type: 2,
-                  style: 5,
-                  label: 'View Full Leaderboard',
-                  url: 'https://spawnboard.pages.dev',
-                },
-              ],
-            },
-          ],
-        },
-      });
+        const description = servers
+          .map((s, i) => `${medal(i)} **${s.server_name}**\n${s.member_count.toLocaleString()} members`)
+          .join('\n\n');
+
+        const embed = {
+          title: 'Top Spawnism Servers',
+          description,
+          color: 0x209af5,
+          footer: { text: 'Want to see more?' },
+          timestamp: new Date().toISOString(),
+        };
+
+        await editInteraction(interaction, env, null, [embed], [
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                style: 5,
+                label: 'View Full Leaderboard',
+                url: 'https://spawnboard.pages.dev',
+              },
+            ],
+          },
+        ]);
+      })();
+
+      return ack;
     }
   }
 
   return new Response('Unknown interaction', { status: 400 });
 };
+
+// Helper: Edit deferred interaction
+async function editInteraction(interaction, env, content = null, embeds = [], components = []) {
+  const payload = {};
+  if (content) payload.content = content;
+  if (embeds.length > 0) payload.embeds = embeds;
+  if (components.length > 0) payload.components = components;
+
+  await fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
 
 // Hex → Uint8Array
 function hexToBytes(hex) {
