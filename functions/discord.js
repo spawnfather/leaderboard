@@ -301,7 +301,7 @@ export const onRequestPost = async ({ request, env }) => {
 
         return Response.json({
           type: 4,
-          data: { embeds: [embed] }
+          data: { embeds: [embed], flags: 64}
         });
       } catch (e) {
         return Response.json({
