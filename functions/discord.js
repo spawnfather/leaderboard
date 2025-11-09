@@ -76,7 +76,7 @@ export const onRequestPost = async ({ request, env }) => {
         inviteData = await res.json();
 
         if (res.status !== 200) {
-          return Response.json({
+          return FlagResponse.json({
             type: 4,
             data: { content: 'Could not fetch invite. Is it valid and not expired?' },
           });
@@ -128,19 +128,38 @@ export const onRequestPost = async ({ request, env }) => {
       });
     }
 
-    // /leaderboard — BARE MINIMUM (NO TIMEOUT)
+    // /leaderboard — EMBED + NUMBERED + LAST UPDATED
     if (name === 'leaderboard') {
       try {
         const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/7');
-        const servers = res.ok ? await res.json() : [];
+        const data = res.ok ? await res.json() : null;
 
-        const text = servers.length
-          ? servers.map(s => `${s.server_name}: ${s.member_count.toLocaleString()} members`).join('\n')
-          : 'No servers found.';
+        if (!data || !data.servers || data.servers.length === 0) {
+          return Response.json({
+            type: 4,
+            data: { content: 'No servers on the leaderboard yet!' }
+          });
+        }
+
+        const { servers, last_updated } = data;
+
+        const desc = servers
+          .map((s, i) => `${i + 1}. **${s.server_name}**\n> ${s.member_count.toLocaleString()} members • [Join](https://discord.gg/${s.invite_code})`)
+          .join('\n\n');
+
+        const updated = new Date(last_updated).toLocaleString();
+
+        const embed = {
+          title: 'Top Spawnism Servers',
+          description: desc,
+          color: 0x209af5,
+          footer: { text: `Last updated: ${updated}` },
+          timestamp: new Date().toISOString()
+        };
 
         return Response.json({
           type: 4,
-          data: { content: `**Top 7 Servers**\n${text}` }
+          data: { embeds: [embed] }
         });
       } catch (e) {
         return Response.json({
