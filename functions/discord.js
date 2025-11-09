@@ -148,7 +148,7 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `**${i + 1}.** ${s.server_name} - ${s.member_count.toLocaleString()} Members`)
+          .map((s, i) => `**${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members`)
           .join('\n');
 
         const embed = {
