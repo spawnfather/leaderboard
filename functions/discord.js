@@ -35,7 +35,7 @@ export const onRequestPost = async ({ request, env }) => {
     return Response.json({ type: 1 }, { status: 200 });
   }
 
-  // PING
+  // === PING ===
   if (interaction.type === 1) {
     return Response.json({ type: 1 });
   }
@@ -76,7 +76,7 @@ export const onRequestPost = async ({ request, env }) => {
         inviteData = await res.json();
 
         if (res.status !== 200) {
-          return FlagResponse.json({
+          return Response.json({
             type: 4,
             data: { content: 'Could not fetch invite. Is it valid and not expired?' },
           });
@@ -128,32 +128,34 @@ export const onRequestPost = async ({ request, env }) => {
       });
     }
 
-    // /leaderboard — EMBED + NUMBERED + LAST UPDATED
+    // /leaderboard — FIXED & WORKING
     if (name === 'leaderboard') {
       try {
         const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/7');
-        const data = res.ok ? await res.json() : null;
+        const servers = res.ok ? await res.json() : [];
 
-        if (!data || !data.servers || data.servers.length === 0) {
+        if (!Array.isArray(servers) || servers.length === 0) {
           return Response.json({
             type: 4,
             data: { content: 'No servers on the leaderboard yet!' }
           });
         }
 
-        const { servers, last_updated } = data;
+        // Get the most recent last_updated from any server
+        const latestUpdate = servers
+          .map(s => new Date(s.last_updated))
+          .sort((a, b) => b - a)[0];
+        const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `${i + 1}. **${s.server_name}**\n> ${s.member_count.toLocaleString()} members • [Join](https://discord.gg/${s.invite_code})`)
+          .map((s, i) => `${i + 1}. **${s.server_name}**\n${s.member_count.toLocaleString()} members • [Join](https://discord.gg/${s.invite_code})`)
           .join('\n\n');
 
-        const updated = new Date(last_updated).toLocaleString();
-
         const embed = {
-          title: 'Top Spawnism Servers',
+          title: 'Top 7 Servers',
           description: desc,
           color: 0x209af5,
-          footer: { text: `Last updated: ${updated}` },
+          footer: { text: `Last updated: ${updatedText}` },
           timestamp: new Date().toISOString()
         };
 
