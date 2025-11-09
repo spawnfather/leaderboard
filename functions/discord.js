@@ -234,6 +234,82 @@ export const onRequestPost = async ({ request, env }) => {
         });
       }
     }
+
+    // /server — LOOKUP ANY INVITE (ANY FORMAT)
+    if (name === 'server') {
+      const input = interaction.data.options?.find(o => o.name === 'invite')?.value || '';
+      if (!input) {
+        return Response.json({
+          type: 4,
+          data: { content: 'Please provide an invite link or code.' }
+        });
+      }
+
+      // Extract code from any format
+      const inviteCode = input.match(/discord(?:app)?\.com\/invite\/([a-zA-Z0-9-]+)|discord\.gg\/([a-zA-Z0-9-]+)|([a-zA-Z0-9-]+)/i);
+      const code = inviteCode ? (inviteCode[1] || inviteCode[2] || inviteCode[3]) : null;
+
+      if (!code) {
+        return Response.json({
+          type: 4,
+          data: { content: 'Invalid invite format. Use `discord.gg/code`, full URL, or just the code.' }
+        });
+      }
+
+      try {
+        const res = await fetch(`https://discord.com/api/v10/invites/${code}?with_counts=true`, {
+          headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}` }
+        });
+
+        if (!res.ok) {
+          return Response.json({
+            type: 4,
+            data: { content: 'Could not fetch invite. Is it valid and not expired?' }
+          });
+        }
+
+        const data = await res.json();
+
+        const expiresAt = data.expires_at;
+        if (expiresAt && new Date(expiresAt) < new Date()) {
+          return Response.json({
+            type: 4,
+            data: { content: `This invite has **expired** on ${new Date(expiresAt).toLocaleString()}.` }
+          });
+        }
+
+        const guild = data.guild;
+        const name = guild.name || 'Unknown Server';
+        const members = data.approximate_member_count || 'Unknown';
+        const online = data.approximate_presence_count || 'Unknown';
+        const vanity = guild.vanity_url_code ? `discord.gg/${guild.vanity_url_code}` : null;
+        const icon = guild.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png` : null;
+
+        const embed = {
+          title: name,
+          color: 0x209af5,
+          thumbnail: icon ? { url: icon } : undefined,
+          fields: [
+            { name: 'Members', value: members.toString(), inline: true },
+            { name: 'Online', value: online.toString(), inline: true },
+            vanity ? { name: 'Vanity URL', value: vanity, inline: false } : null,
+            { name: 'Invite', value: `[Join Server](https://discord.gg/${code})`, inline: false }
+          ].filter(Boolean),
+          footer: { text: 'Powered by Discord API' },
+          timestamp: new Date().toISOString()
+        };
+
+        return Response.json({
+          type: 4,
+          data: { embeds: [embed] }
+        });
+      } catch (e) {
+        return Response.json({
+          type: 4,
+          data: { content: 'Failed to fetch server info. Try again later.' }
+        });
+      }
+    }
   }
 
   return new Response('Unknown interaction', { status: 400 });
