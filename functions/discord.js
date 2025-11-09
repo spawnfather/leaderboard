@@ -148,8 +148,8 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `**${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members`)
-          .join('\n');
+          .map((s, i) => `**${i + 1}.** ${s.server_name}\n> ${s.member_count.toLocaleString()} Members`)
+          .join('\n\n');
 
         const embed = {
           title: 'Top Spawnism Servers',
@@ -161,7 +161,22 @@ export const onRequestPost = async ({ request, env }) => {
 
         return Response.json({
           type: 4,
-          data: { embeds: [embed] }
+          data: {
+            embeds: [embed],
+            components: [
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    style: 5, // Link button
+                    label: 'View Full Leaderboard',
+                    url: 'https://spawnboard.pages.dev'
+                  }
+                ]
+              }
+            ]
+          }
         });
       } catch (e) {
         return Response.json({
