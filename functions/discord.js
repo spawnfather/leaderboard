@@ -148,14 +148,14 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `**${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members`)
+          .map((s, i) => `:medal: **${i + 1}.** ${s.server_name}\n > ${s.member_count.toLocaleString()} Members`)
           .join('\n');
 
         const embed = {
           title: 'Top Spawnism Servers',
           description: desc,
           color: 0x209af5,
-          footer: { text: `Last updated: ${updatedText}` },
+          footer: { text: 'Data updates every 3 Hours!' },
           timestamp: new Date().toISOString()
         };
 
