@@ -128,7 +128,7 @@ export const onRequestPost = async ({ request, env }) => {
       });
     }
 
-    // /leaderboard — FIXED & WORKING
+    // /leaderboard — YOUR CUSTOM TOP 5
     if (name === 'leaderboard') {
       try {
         const res = await fetch('https://spawnboard.pages.dev/leaderboard/top/5');
@@ -141,7 +141,6 @@ export const onRequestPost = async ({ request, env }) => {
           });
         }
 
-        // Get the most recent last_updated from any server
         const latestUpdate = servers
           .map(s => new Date(s.last_updated))
           .sort((a, b) => b - a)[0];
@@ -174,7 +173,7 @@ export const onRequestPost = async ({ request, env }) => {
                 components: [
                   {
                     type: 2,
-                    style: 5, // Link button
+                    style: 5,
                     label: 'View Full Leaderboard',
                     url: 'https://spawnboard.pages.dev'
                   }
@@ -187,6 +186,51 @@ export const onRequestPost = async ({ request, env }) => {
         return Response.json({
           type: 4,
           data: { content: 'Error loading leaderboard.' }
+        });
+      }
+    }
+
+    // /stats — SPAWNBOARD OVERVIEW (NO JOIN LINKS)
+    if (name === 'stats') {
+      try {
+        const res = await fetch('https://spawnboard.pages.dev/leaderboard/stats');
+        const stats = res.ok ? await res.json() : null;
+
+        if (!stats) {
+          return Response.json({
+            type: 4,
+            data: { content: 'Failed to load stats.' }
+          });
+        }
+
+        const embed = {
+          title: 'Spawnboard Stats',
+          description: `**${stats.total_servers}** servers listed\n**${stats.total_members.toLocaleString()}** total members`,
+          color: 0x209af5,
+          fields: [
+            {
+              name: 'Largest Server',
+              value: `**${stats.largest_server.server_name}**\n${stats.largest_server.member_count.toLocaleString()} members`,
+              inline: true
+            },
+            {
+              name: 'Smallest Server',
+              value: `**${stats.smallest_server.server_name}**\n${stats.smallest_server.member_count.toLocaleString()} members`,
+              inline: true
+            }
+          ],
+          footer: { text: 'Data updates every hour' },
+          timestamp: new Date().toISOString()
+        };
+
+        return Response.json({
+          type: 4,
+          data: { embeds: [embed] }
+        });
+      } catch (e) {
+        return Response.json({
+          type: 4,
+          data: { content: 'Error loading stats.' }
         });
       }
     }
