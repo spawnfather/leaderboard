@@ -147,16 +147,18 @@ export const onRequestPost = async ({ request, env }) => {
           .sort((a, b) => b - a)[0];
         const updatedText = latestUpdate.toLocaleString();
 
-        const desc = servers
-          .map((s, i) => {
-            const medal = i === 0 ? ':first_place:' : i === 1 ? ':second_place:' : i === 2 ? ':third_place:' : ':medal:';
-            return `${medal} **${i + 1}.** ${s.server_name}\n> ${s.member_count.toLocaleString()} Members`;
-          })
-          .join('\n\n');
+        const fields = servers.map((s, i) => {
+          const medal = i === 0 ? ':first_place:' : i === 1 ? ':second_place:' : i === 2 ? ':third_place:' : ':medal:';
+          return {
+            name: `${medal} **${i + 1}.** ${s.server_name}`,
+            value: `> **${s.member_count.toLocaleString()} Members** • [Join](https://discord.gg/${s.invite_code})`,
+            inline: false
+          };
+        });
 
         const embed = {
           title: 'Top Spawnism Servers',
-          description: desc,
+          fields,
           color: 0x209af5,
           footer: { text: 'Data updates every 3 Hours!' },
           timestamp: new Date().toISOString()
