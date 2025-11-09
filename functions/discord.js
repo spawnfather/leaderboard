@@ -148,11 +148,11 @@ export const onRequestPost = async ({ request, env }) => {
         const updatedText = latestUpdate.toLocaleString();
 
         const desc = servers
-          .map((s, i) => `${i + 1}. **${s.server_name}**\n${s.member_count.toLocaleString()} members • [Join](https://discord.gg/${s.invite_code})`)
+          .map((s, i) => `**${i + 1}.** ${s.server_name}\n >${s.member_count.toLocaleString()} Members`)
           .join('\n\n');
 
         const embed = {
-          title: 'Top 7 Servers',
+          title: 'Top Spawnism Servers',
           description: desc,
           color: 0x209af5,
           footer: { text: `Last updated: ${updatedText}` },
